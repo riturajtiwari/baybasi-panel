@@ -1,0 +1,29 @@
+[Unit]
+Description=Baybasi wall driver
+Documentation=file:///opt/baybasi/README.md
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
+
+[Service]
+Type=simple
+User=baybasi
+Group=baybasi
+WorkingDirectory=/opt/baybasi
+ExecStart=/opt/baybasi/.venv/bin/baybasi --config /opt/baybasi/config/wall.yaml --data /var/lib/baybasi driver
+Restart=always
+RestartSec=2
+
+# The wall is a soft-real-time job: a late frame is a visible stutter.
+Nice=-10
+IOSchedulingClass=realtime
+LimitNOFILE=4096
+
+# It only needs the pixel network and its own data directory.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/baybasi
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,119 @@
+<meta charset="utf-8">
+<title>Baybasi Pixel Wall — Shopping List</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9pt;
+         line-height: 1.42; color: #16181c; }
+  h1 { font-size: 16pt; margin: 0 0 1mm; letter-spacing: -0.2pt; }
+  .sub { color: #5a626b; font-size: 9pt; margin: 0 0 5mm; }
+  h2 { font-size: 10.5pt; margin: 6mm 0 1.5mm; padding-bottom: 1mm;
+       border-bottom: 1.2pt solid #16181c; }
+  p { margin: 0 0 2mm; }
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 3mm; font-size: 8.5pt; }
+  th { text-align: left; font-size: 7.5pt; letter-spacing: 0.5pt; text-transform: uppercase;
+       color: #5a626b; border-bottom: 1pt solid #9aa1a8; padding: 1.2mm 1.5mm; }
+  td { border-bottom: 0.4pt solid #dde1e5; padding: 1.2mm 1.5mm; vertical-align: top; }
+  td.q { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.hi td { background: #eef3f7; }
+  .box { border-left: 2.5pt solid #16181c; padding: 0 0 0 3.5mm; margin: 3mm 0; }
+  .box.warn { border-color: #9C5F1E; }
+  .box .lbl { font-size: 7.5pt; letter-spacing: 0.6pt; text-transform: uppercase;
+              color: #5a626b; display: block; margin-bottom: 0.8mm; }
+  code { font-family: "SF Mono", Menlo, monospace; font-size: 8pt; background: #eef0f2; padding: 0.2mm 0.8mm; }
+  .note { color: #5a626b; }
+</style>
+
+<h1>Baybasi Pixel Wall &mdash; Shopping List</h1>
+<p class="sub">Two displays &middot; 8 controllers in service, 10 built &middot; 96 panels &middot; 24,576 LEDs</p>
+
+<div class="box">
+  <span class="lbl">Order everything at once</span>
+  <p>The last unknown is resolved. The W5500 header row spacing is <strong>20.32 mm</strong>, from the WIZ820io User Manual V1.0 section 5 (symbol B, "20.32 (2.54 x 8)"). WIZnet specify the WIZ850io as a fully pin-compatible replacement for the WIZ820io, and both are 23 &times; 25 mm with two 1&times;6 headers on 2.54 mm pitch.</p>
+  <p>Nothing needs measuring first. Parts and PCBs can go in the same day.</p>
+</div>
+
+<h2>Controller boards &mdash; per board &times; 10</h2>
+<table>
+<thead><tr><th>Qty</th><th>Part</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="hi"><td class="q">10</td><td><strong>ESP32-S3-DevKitC-1</strong> (N8R8 or N16R8)</td><td>Official Espressif board. <strong>Buy all ten from one listing in one order</strong> &mdash; clone 30-pin boards vary mechanically and we depend on 0.900&Prime; rows.</td></tr>
+<tr class="hi"><td class="q">10</td><td><strong>W5500 module, 23 &times; 25 mm</strong><br><span class="note">USR-ES1 / "W5500 Lite"</span></td><td>Pin-to-pin compatible with the WIZ850io and the same ~23 &times; 25 mm board, so the 20.32 mm row spacing carries over. <strong>Identify it by the spec table, not the title:</strong> board ~23 &times; 25 mm, supply <strong>3.3 V only, &ge;200 mA, no onboard regulator</strong>. Ignore "3.3V/5V" in listing titles &mdash; that refers to 5 V-tolerant I/O and appears on both the right and wrong boards. The wrong one is the larger "Standard Blue" board with an AMS1117 and a single 2&times;5 dual-row header. Roughly <strong>$6&ndash;12</strong> each against $19.68 for the WIZnet part &mdash; same W5500 silicon. Buy 12 and test them. <strong>Not the WIZ820io</strong> (that is a W5200, different chip, no driver support).</td></tr>
+<tr class="hi"><td class="q">2 packs</td><td><strong>ACEIRMC 5-pack</strong><br><span class="note">Amazon B0DTTLGJCS</span></td><td><strong>$25.99 for five = $5.20 each.</strong> Listing states "PCB size: 23 * 25 mm", "USR-ES1", "3.3V external power supply, current should be more than 200mA" &mdash; three independent confirmations of the Lite footprint, and the photo shows the small green HanRun boards. Ships from Amazon, free 30-day refund/replacement, Amazon's Choice, 4.3&#9733;. A 3-pack option is $17.99 ($6.00 each). <strong>Two packs = 10 units for $51.98</strong>; three packs = 15 for $77.97 if you want generous spares.</td></tr>
+<tr><td class="q">alt</td><td>HiLetgo single<br><span class="note">B08KXM8TKJ</span></td><td>$9.99 each, also verified correct (25.7 &times; 22.8 mm, 3.3 V, &ge;200 mA). Useful for buying one immediately; nearly twice the unit price in bulk.</td></tr>
+<tr><td class="q">&mdash;</td><td>Avoid: Amazon B0CDWX9VQ5</td><td>HiLetgo 2-pack at $12.99. Photo shows the elongated blue board with a single-row header &mdash; wrong form factor.</td></tr>
+<tr><td class="q">20</td><td>TI SN74AHCT245N, DIP-20</td><td><strong>AHCT</strong>, not AHC or HC &mdash; TTL input thresholds are the whole point</td></tr>
+<tr><td class="q">&mdash;</td><td>Everything else on the board</td><td>Fitted by JLCPCB with the boards: DIP sockets, both socket rows, regulator, FET, inductor, all resistors and capacitors, all terminal blocks, sync header. Nothing to buy, nothing to solder. See <em>Printed circuit boards</em>.</td></tr>
+<tr><td class="q">40</td><td>M3 &times; 10 mm standoff + screw</td><td>4 per board</td></tr>
+</tbody>
+</table>
+
+<h2>Per system &times; 2</h2>
+<table>
+<thead><tr><th>Qty</th><th>Part</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="q">2</td><td>Raspberry Pi 3 or newer</td><td>The Kano Pi serves one. Source a second.</td></tr>
+<tr><td class="q">2</td><td>microSD card, 16 GB+</td><td>Raspberry Pi OS Lite. Do not reuse the Kano card.</td></tr>
+<tr><td class="q">2</td><td>5 V / 3 A USB supply for the Pi</td><td><strong>Not</strong> the Kano battery pack, and not off an LED rail</td></tr>
+<tr><td class="q">2</td><td>8-port unmanaged switch</td><td>5 ports used. 100 Mbit is enough; gigabit costs the same.</td></tr>
+<tr><td class="q">10</td><td>Cat5e UTP patch lead</td><td>4 + 1 per system. <strong>Unshielded</strong> &mdash; shielded bonds the column grounds together.</td></tr>
+</tbody>
+</table>
+
+<h2>Panel wiring &mdash; 96 panels</h2>
+<table>
+<thead><tr><th>Qty</th><th>Part</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="hi"><td class="q">104</td><td><strong>3-pin JST-SM extension lead, 22 AWG</strong><br><span class="note">Amazon B0F6SZF25C, 4-pack, pick the length variant</span></td><td>One per panel plus spares; 26 packs. <strong>2&nbsp;m / 6.56&nbsp;ft ($8.99/pack)</strong> if the controller mounts mid-column, 3&nbsp;m / 9.84&nbsp;ft ($9.99/pack) if it mounts at the bottom. Male one end, female the other, so one end mates with the panel whichever gender it is; cut the other end off and land white (GND) and green (DATA) in the screw terminal. <strong>Cut the red +5&nbsp;V conductor at both ends and heat-shrink the stubs</strong> &mdash; panel power never goes through the controller.</td></tr>
+<tr><td class="q">1 roll</td><td>Heat-shrink tubing, 2&ndash;3 mm, and cable labels</td><td>For the 208 cut red stubs, and to number both ends of every lead before assembly.</td></tr>
+<tr><td class="q">200</td><td>Small zip ties</td><td>One per JST-SM plug at the panel; the latch alone is not enough once the display moves.</td></tr>
+<tr><td class="q">96</td><td>1000 &micro;F 10 V electrolytic</td><td>Across 5 V at each panel's power entry</td></tr>
+<tr><td class="q">&mdash;</td><td>14&ndash;16 AWG for power injection</td><td>Per your existing harness</td></tr>
+<tr><td class="q">&mdash;</td><td>Inline fuses, one per injection run</td><td>A shorted strand behind a 60 A supply is a fire</td></tr>
+</tbody>
+</table>
+
+<h2>Printed circuit boards</h2>
+<table>
+<thead><tr><th>Qty</th><th>Part</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="hi"><td class="q">10</td><td><strong>PCB, 100 &times; 95 mm, 2-layer</strong></td><td>Upload <code>baybasi-ctrl-&lt;date&gt;-gerbers.zip</code> plus <code>jlcpcb-bom.csv</code> and <code>jlcpcb-cpl.csv</code>. HASL lead-free, 1.6 mm, 1 oz, tented vias. <strong>Assembly: yes &mdash; Economic, top side, "Confirm Parts Placement" on.</strong> About $60&ndash;90 for five assembled boards plus $20&ndash;25 shipping; order five, prove one, then the rest.</td></tr>
+</tbody>
+</table>
+
+<h2>Where to order</h2>
+<p>Split the order by <strong>risk</strong>, not by price. Two parts decide whether the boards work; the rest is commodity.</p>
+<table>
+<thead><tr><th>Vendor</th><th>Buy here</th><th>Why</th></tr></thead>
+<tbody>
+<tr class="hi"><td><strong>DigiKey</strong><br><span class="note">one order</span></td>
+ <td>ESP32-S3-DevKitC-1 &times;10 &middot; SN74AHCT245N &times;20</td>
+ <td>Devkits ship same day and are genuine Espressif. Authorised distributor, so the Espressif boards are genuine and mechanically consistent &mdash; which is the entire reason we chose the S3. US delivery in about two days.</td></tr>
+<tr><td>Mouser or Arrow</td><td>Same list, if DigiKey is short</td>
+ <td>Arrow was marginally cheaper on the WIZ850io (~$17.14 in tens) but held only ~93 units. Fine as a backup; not worth a second shipment.</td></tr>
+<tr><td>Amazon</td><td>M3 standoffs &middot; hookup and twisted wire &middot; Cat5e leads &middot; 8-port switches &middot; Pi supplies &middot; microSD</td>
+ <td>Commodity mechanical parts where brand does not matter and next-day delivery does. <strong>Do not</strong> buy the devkits or the W5500 here &mdash; listings claiming "official" frequently are not.</td></tr>
+<tr><td>PiShop / Adafruit / CanaKit</td><td>The second Raspberry Pi</td>
+ <td>Any Pi 3 or newer. Adafruit and PiShop are reliable on genuine stock.</td></tr>
+<tr><td>LCSC</td><td>Only if cost beats schedule</td>
+ <td>WIZ850io is <code>C134462</code> and the passives are far cheaper in bulk, but shipping from China runs one to two weeks. Given the W5500 measurement gates the PCB order, that delay costs more than it saves.</td></tr>
+<tr><td>JLCPCB</td><td>The PCBs, assembled</td>
+ <td>Under 100 &times; 100 mm is the cheap tier. PCBWay is equivalent; Aisler if you want EU.</td></tr>
+</tbody>
+</table>
+
+<div class="box">
+  <span class="lbl">Two things worth knowing before you spend</span>
+  <p><strong>Do not pay the WIZnet premium.</strong> DigiKey want $24.52 for one WIZ850io and $19.68 each in tens &mdash; about $197 for the Ethernet alone. The W5500 chip inside costs a few dollars; the rest is distributor margin on a low-volume first-party module. The USR-ES1 clone is the same silicon on the same 23 &times; 25 mm board, specified pin-to-pin compatible, at roughly a third of the price. The USR-ES1 / W5500 Lite is specified as pin-to-pin compatible with the WIZ850io on an identical 23 &times; 25 mm board, so it inherits the 20.32 mm spacing. It is the same W5500 silicon at roughly a third of the price.</p>
+  <p><strong>Do not substitute the WIZ820io.</strong> It is mechanically identical and sold alongside the WIZ850io, but it carries a <strong>W5200</strong>, not a W5500. Different register map, no driver in the ESP32 Ethernet stack we use, and it needs a hardware reset pulse our board does not generate. It is also end-of-life.</p>
+</div>
+
+<p class="note">Rough total, excluding LED power supplies: about <strong>$340</strong> in board parts with clone Ethernet modules (about $470 if you insist on WIZnet), plus about $135 for the second Pi, two switches and cabling, plus about $30 of PCBs. Call it <strong>$510</strong>. Add US tariffs &mdash; DigiKey warn they may apply and are only shown at checkout.</p>
+
+<div class="box">
+  <span class="lbl">Three things that will bite if you get them wrong</span>
+  <p><strong>1. AHCT, not HC.</strong> An <code>SN74HC245</code> looks identical and will not reliably read 3.3 V as a logic high from a 5 V rail.</p>
+  <p><strong>2. Terminal block pitch.</strong> 3.5 mm and 3.81 mm are sold side by side and look the same in a photograph. The board is drilled for 3.5.</p>
+  <p><strong>3. The W5500 module is 3.3 V only.</strong> It has no regulator. 5 V on its V pins destroys it instantly. The larger blue W5500 boards <em>do</em> take 5 V &mdash; do not mix them up.</p>
+</div>
+
+<p class="note">Power supplies for the LEDs are excluded &mdash; you said those are handled separately. For reference the design target is roughly 295 A per display at 5 V, sized at 40% of the 737 A theoretical maximum.</p>

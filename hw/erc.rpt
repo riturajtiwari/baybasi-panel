@@ -1,0 +1,34 @@
+ERC report (2026-09-07T01:48:18, Encoding UTF8)
+Report includes: Errors, Warnings
+
+***** Sheet /
+[pin_to_pin]: Pins of type Tri-state and Power input are connected
+    ; warning
+    @(213.36 mm, 154.94 mm): Symbol U1 Pin 8 [A6, Tri-state, Line]
+    @(226.06 mm, 172.72 mm): Symbol U1 Pin 10 [GND, Power input, Line]
+[pin_to_pin]: Pins of type Tri-state and Power input are connected
+    ; warning
+    @(213.36 mm, 157.48 mm): Symbol U1 Pin 9 [A7, Tri-state, Line]
+    @(226.06 mm, 172.72 mm): Symbol U1 Pin 10 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol '74HC245' doesn't match copy in library '74xx'
+    ; warning
+    @(226.06 mm, 152.40 mm): Symbol U1 [74HC245]
+[pin_to_pin]: Pins of type Tri-state and Power input are connected
+    ; warning
+    @(284.48 mm, 154.94 mm): Symbol U2 Pin 8 [A6, Tri-state, Line]
+    @(297.18 mm, 172.72 mm): Symbol U2 Pin 10 [GND, Power input, Line]
+[pin_to_pin]: Pins of type Tri-state and Power input are connected
+    ; warning
+    @(284.48 mm, 157.48 mm): Symbol U2 Pin 9 [A7, Tri-state, Line]
+    @(297.18 mm, 172.72 mm): Symbol U2 Pin 10 [GND, Power input, Line]
+[lib_symbol_mismatch]: Symbol '74HC245' doesn't match copy in library '74xx'
+    ; warning
+    @(297.18 mm, 152.40 mm): Symbol U2 [74HC245]
+
+ ** ERC messages: 6  Errors 0  Warnings 6
+
+ ** Ignored checks:
+    - Global label only appears once in the schematic
+    - Four connection points are joined together
+    - SPICE model issue
+    - Assigned footprint doesn't match footprint filters

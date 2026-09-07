@@ -1,0 +1,107 @@
+<meta charset="utf-8">
+<title>W5500 Module Measurement Request</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+         font-size: 10.5pt; line-height: 1.5; color: #16181c; }
+  h1 { font-size: 17pt; margin: 0 0 2mm; letter-spacing: -0.2pt; }
+  .sub { color: #5a626b; font-size: 10pt; margin: 0 0 6mm; }
+  h2 { font-size: 11.5pt; margin: 7mm 0 2mm; padding-bottom: 1.2mm;
+       border-bottom: 1.2pt solid #16181c; }
+  h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2.5mm; }
+  ol, ul { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin: 0 0 1.2mm; }
+  table { border-collapse: collapse; width: 100%; margin: 3mm 0 4mm; font-size: 10pt; }
+  th { text-align: left; font-size: 8.5pt; letter-spacing: 0.6pt; text-transform: uppercase;
+       color: #5a626b; border-bottom: 1pt solid #9aa1a8; padding: 1.6mm 2mm; }
+  td { border-bottom: 0.5pt solid #d8dce0; padding: 1.6mm 2mm; vertical-align: top; }
+  tr.hi td { background: #eef3f7; font-weight: 600; }
+  .box { border-left: 2.5pt solid #16181c; padding: 0 0 0 4mm; margin: 4mm 0; }
+  .box .lbl { font-size: 8.5pt; letter-spacing: 0.7pt; text-transform: uppercase;
+              color: #5a626b; display: block; margin-bottom: 1mm; }
+  code { font-family: "SF Mono", Menlo, monospace; font-size: 9.5pt;
+         background: #eef0f2; padding: 0.3mm 1mm; }
+  .formula { font-family: "SF Mono", Menlo, monospace; font-size: 10.5pt;
+             background: #eef0f2; padding: 2.5mm 3mm; margin: 2mm 0 4mm; }
+  .foot { margin-top: 8mm; padding-top: 2.5mm; border-top: 0.5pt solid #d8dce0;
+          font-size: 8.5pt; color: #5a626b; }
+</style>
+
+<h1>W5500 Module &mdash; Measurement Request</h1>
+<p class="sub">Written in ASD-STE100 Simplified Technical English.</p>
+
+<h2>1. Why we need this data</h2>
+<p>We build a printed circuit board. The W5500 module attaches to this board.</p>
+<p>The module has two rows of pins. We must know the distance between the two rows. We must know this distance before we make the board.</p>
+<p>The manufacturer does not give this distance. The data sheet does not have it.</p>
+
+<div class="box">
+  <span class="lbl">Important</span>
+  <p>Do not send a photograph of the module with a ruler. We tried this two times. It did not work.</p>
+  <p>A photograph gives an error of 2 mm to 7 mm. The distance that we must find changes in steps of 2.54 mm. Thus the error is larger than the step. A photograph cannot give the correct answer.</p>
+</div>
+
+<h2>2. Procedure A &mdash; count the holes</h2>
+<p>This procedure gives an exact answer. You do not measure a length. You count holes.</p>
+<ol>
+  <li>Get a breadboard. You can also use a piece of perfboard. The holes must have a pitch of 0.1 inch (2.54 mm).</li>
+  <li>Push the pins of the module into the holes. Push the module down fully.</li>
+  <li>Select one pin in the first row.</li>
+  <li>Find the pin in the second row that is directly opposite this pin.</li>
+  <li>Count the empty holes between the two pins.</li>
+  <li>Record this number.</li>
+</ol>
+<p>Send us the number only. Do not measure a distance.</p>
+
+<h2>3. Procedure B &mdash; find the direction of the socket</h2>
+<ol>
+  <li>Hold the module. The pins must point down.</li>
+  <li>Turn the module until the Ethernet socket points at you.</li>
+  <li>Look at the two rows of pins.</li>
+  <li>Tell us the direction of the rows. The rows go from left to right, or the rows go away from you.</li>
+</ol>
+
+<h2>4. Procedure C &mdash; identify the module</h2>
+<ol>
+  <li>Read the text that is printed on the circuit board.</li>
+  <li>Send us this text. You can also send a photograph of the text.</li>
+</ol>
+<p>The module is one of two types. It is a WIZnet WIZ850io. It is also possible that it is a W5500 Lite copy or a USR-ES1 copy.</p>
+<p>The two types have the same pin functions. The two types do not have the same shape. Thus we must know the type.</p>
+
+<h2>5. What we do with your data</h2>
+
+<h3>Data from procedure A</h3>
+<p>The pitch of the pins is 2.54 mm. This value is a standard. Thus we calculate the distance:</p>
+<div class="formula">distance = (number of holes + 1) &times; 2.54 mm</div>
+<table>
+  <thead><tr><th>Holes between the rows</th><th>Distance</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>2.54 mm</td><td>The two rows touch. This is one 2 &times; 6 connector.</td></tr>
+    <tr><td>5</td><td>15.24 mm</td><td></td></tr>
+    <tr><td>6</td><td>17.78 mm</td><td></td></tr>
+    <tr class="hi"><td>7</td><td>20.32 mm</td><td>This is the value that our design uses now.</td></tr>
+    <tr><td>8</td><td>22.86 mm</td><td>This is the same as the ESP32 board.</td></tr>
+  </tbody>
+</table>
+
+<h3>Data from procedure B</h3>
+<p>We turn the module on the circuit board. The Ethernet socket must point away from the board. Your data tells us the angle.</p>
+
+<h3>Data from procedure C</h3>
+<p>Your data tells us if the distance is correct for our module.</p>
+
+<h2>6. If you do not have a breadboard</h2>
+<ol>
+  <li>Get a caliper.</li>
+  <li>Measure from the center of one pin to the center of the pin opposite it.</li>
+  <li>Send us the value. Give one number after the decimal point.</li>
+</ol>
+<p>We round your value to the nearest multiple of 2.54 mm. The correct value is always a multiple of 2.54 mm.</p>
+
+<p class="foot">
+  After we get your answer, we change one line in the file <code>gen_pcb.py</code>.
+  Then we make the board again and we test it. This operation takes 10 seconds.
+  We do not order the boards before we have your answer.
+</p>

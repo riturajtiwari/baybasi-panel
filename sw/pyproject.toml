@@ -1,0 +1,31 @@
+[project]
+name = "baybasi"
+version = "0.1.0"
+description = "Driver, upload utility and DDP test sink for the Baybasi WS2812B pixel wall"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+    "pillow>=10.0",
+    "flask>=3.0",
+    "waitress>=3.0",
+]
+
+[project.scripts]
+baybasi = "baybasi.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["baybasi*"]
+
+[tool.setuptools.package-data]
+baybasi = ["web/templates/*.html", "web/static/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

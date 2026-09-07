@@ -1,0 +1,28 @@
+# Third-party tool, 61 MB. Download it from https://github.com/freerouting/freerouting
+tools/
+
+# Python
+sw/.venv/
+sw/*.egg-info/
+sw/.pytest_cache/
+__pycache__/
+*.pyc
+
+# Runtime data: uploaded media, decoded frame cache, driver status
+sw/data/
+sw/render/
+sw/sink-frames/
+
+# PlatformIO build output
+fw/.pio/
+
+# KiCad locks, backups and superseded files
+hw/*.lck
+hw/~*
+hw/*.bak
+hw/*.pre-qa
+hw/fp-info-cache
+hw/*-backups/
+
+# macOS
+.DS_Store

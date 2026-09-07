@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baybasi wall</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0a0c0f; --card:#12161c; --line:#232a33; --fg:#e8ecf2; --dim:#8d97a5;
+  --acc:#7dd3fc; --ok:#4ade80; --bad:#f87171; --warn:#fbbf24;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+a{color:var(--acc)}
+header{padding:14px 18px;border-bottom:1px solid var(--line);
+       display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+       position:sticky;top:0;background:rgba(10,12,15,.94);backdrop-filter:blur(8px);z-index:20}
+h1{font-size:16px;margin:0;letter-spacing:.10em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.pill{font:12px/1 ui-monospace,Menlo,monospace;padding:6px 9px;border:1px solid var(--line);
+      border-radius:99px;color:var(--dim);white-space:nowrap}
+.pill b{color:var(--fg);font-weight:600}
+.pill.ok{border-color:#1d4a30;color:var(--ok)} .pill.bad{border-color:#5b2020;color:var(--bad)}
+main{display:grid;grid-template-columns:minmax(240px,300px) 1fr;gap:20px;padding:20px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card+.card{margin-top:16px}
+h2{font-size:12px;letter-spacing:.10em;text-transform:uppercase;color:var(--dim);margin:0 0 12px}
+button{font:inherit;font-size:13px;padding:7px 12px;border-radius:8px;cursor:pointer;
+       border:1px solid var(--line);background:#1a212a;color:var(--fg)}
+button:hover{border-color:#39434f}
+button.primary{background:#0e4f6b;border-color:#12657f;color:#e6f6ff}
+button.danger:hover{border-color:#7f1d1d;color:var(--bad)}
+button:disabled{opacity:.4;cursor:default}
+select,input[type=text],input[type=number],textarea{
+  font:inherit;font-size:13px;background:#0e1319;color:var(--fg);
+  border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+textarea{width:100%;min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.stack{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#drop{border:2px dashed var(--line);border-radius:var(--r);padding:22px;text-align:center;
+      color:var(--dim);cursor:pointer;transition:.15s}
+#drop.hot{border-color:var(--acc);color:var(--acc);background:#0e1a22}
+.wallview{background:#000;border-radius:8px;padding:6px;display:inline-block;line-height:0}
+.wallview img{image-rendering:pixelated;border-radius:3px;display:block}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+   text-align:left;font-weight:400;padding:0 10px 8px 0}
+td{padding:10px 10px 10px 0;border-top:1px solid var(--line);vertical-align:middle}
+tr.off{opacity:.45}
+.thumb{background:#000;border-radius:4px;line-height:0;display:inline-block}
+.thumb img{image-rendering:pixelated;display:block;border-radius:3px;cursor:zoom-in}
+.name{font-weight:600}
+.meta{font-size:12px;color:var(--dim);font-family:ui-monospace,Menlo,monospace}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.digest{font-family:ui-monospace,Menlo,monospace;font-size:19px;letter-spacing:.04em;
+        color:var(--acc);word-break:break-all;user-select:all}
+.msg{margin-top:10px;font-size:13px;padding:9px 11px;border-radius:8px;display:none}
+.msg.show{display:block}
+.msg.err{background:#2a1416;color:#fca5a5;border:1px solid #5b2020}
+.msg.good{background:#0f2418;color:#86efac;border:1px solid #1d4a30}
+dialog{background:var(--card);color:var(--fg);border:1px solid var(--line);
+       border-radius:12px;padding:16px;max-width:95vw}
+dialog::backdrop{background:rgba(0,0,0,.72)}
+.ctrl-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);
+          font-size:13px;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:99px;background:var(--dim);flex:none}
+.dot.ok{background:var(--ok)} .dot.bad{background:var(--bad)} .dot.warn{background:var(--warn)}
+.hint{font-size:12px;color:var(--dim);margin-top:8px}
+.empty{color:var(--dim);text-align:center;padding:26px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Baybasi wall</h1>
+  <span class="pill">{{ wall.width }}&times;{{ wall.height }} &middot; <b>{{ wall.render.fps }} fps</b></span>
+  <span class="pill" id="p-driver">driver <b>?</b></span>
+  <span class="pill" id="p-fps">fps <b>-</b></span>
+  <span class="pill" id="p-drop">dropped <b>-</b></span>
+  <span class="pill" id="p-now">-</span>
+  <span style="flex:1"></span>
+  <button id="btn-reload">Reload driver</button>
+</header>
+
+<main>
+<div>
+  <div class="card">
+    <h2>On the wall now</h2>
+    <div class="wallview"><img id="now" width="192" height="576" alt="live wall preview"></div>
+    <div class="hint">Rendered through the driver's own gamma, brightness and dither.</div>
+  </div>
+
+  <div class="card">
+    <h2>Both walls in step</h2>
+    <div class="hint" style="margin:0 0 8px">Same digest on both Pis means the same
+      timeline. Upload to each Pi in turn, then compare.</div>
+    <div class="digest" id="digest">-</div>
+    <div class="meta" id="tl-meta" style="margin-top:6px"></div>
+    <div class="stack" style="margin-top:12px">
+      <a href="/manifest.json"><button>Download manifest</button></a>
+      <button id="btn-compare">Compare…</button>
+    </div>
+    <div class="msg" id="cmp-msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Controllers</h2>
+    <div id="controllers"><div class="empty">nothing has announced itself</div></div>
+    <div class="hint">A new board appears here by MAC. Give it a column once;
+      it keeps it across OTA.</div>
+  </div>
+</div>
+
+<div>
+  <div class="card">
+    <h2>Add media</h2>
+    <div id="drop">
+      <b>Drop files here</b> or click to choose<br>
+      <span class="meta">{{ allowed }} &middot; up to {{ max_mb }} MB</span>
+    </div>
+    <input type="file" id="file" multiple accept="image/*,video/*,.gif" hidden>
+    <div class="stack" style="margin-top:12px">
+      <label class="meta" for="upfit">fit</label>
+      <select id="upfit">{% for f in fits %}<option value="{{ f }}">{{ f }}</option>{% endfor %}</select>
+      <span class="meta">The wall is tall and narrow. Check the preview.</span>
+    </div>
+    <div class="msg" id="up-msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Playlist</h2>
+    <table>
+      <thead><tr>
+        <th style="width:1%"></th><th style="width:1%">preview</th><th>item</th>
+        <th>fit</th><th>seconds</th><th style="width:1%">on</th><th style="width:1%"></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty">Nothing uploaded yet.</div>
+  </div>
+</div>
+</main>
+
+<dialog id="dlg-cmp">
+  <h2>Compare with the other Pi</h2>
+  <div class="hint">Download the manifest from the other Pi and paste it here.</div>
+  <textarea id="cmp-in" placeholder="paste manifest.json"></textarea>
+  <div class="stack" style="margin-top:10px;justify-content:flex-end">
+    <button onclick="document.getElementById('dlg-cmp').close()">Cancel</button>
+    <button class="primary" id="cmp-go">Compare</button>
+  </div>
+</dialog>
+
+<dialog id="dlg-big">
+  <div class="stack" style="justify-content:space-between;margin-bottom:10px">
+    <b id="big-title"></b>
+    <button onclick="document.getElementById('dlg-big').close()">Close</button>
+  </div>
+  <div class="wallview"><img id="big-img" alt="full preview"></div>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const FPS = {{ wall.render.fps }};
+let state = null, busy = false;
+
+function msg(el, text, good){
+  el.textContent = text;
+  el.className = 'msg show ' + (good ? 'good' : 'err');
+  if (good) setTimeout(() => el.className = 'msg', 4000);
+}
+async function api(url, opts){
+  const r = await fetch(url, opts);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || (r.status + ' ' + r.statusText));
+  return j;
+}
+const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+
+// ---- render ---------------------------------------------------------
+
+function renderHeader(s){
+  const d = s.driver || {};
+  const live = d.uptime_s !== undefined && (d.stale_s ?? 99) < 5;
+  $('#p-driver').className = 'pill ' + (live ? 'ok' : 'bad');
+  $('#p-driver').innerHTML = 'driver <b>' + (live ? 'running' : 'not running') + '</b>';
+  $('#p-fps').innerHTML = 'fps <b>' + (live ? (d.fps_actual ?? 0).toFixed(2) : '-') + '</b>';
+  const dropped = d.dropped ?? 0;
+  $('#p-drop').className = 'pill ' + (dropped ? 'bad' : '');
+  $('#p-drop').innerHTML = 'dropped <b>' + (live ? dropped : '-') + '</b>';
+  $('#p-now').innerHTML = live ? esc(d.now_playing || '-') : 'idle';
+
+  const m = s.manifest;
+  $('#digest').textContent = m.digest.slice(0, 24);
+  $('#tl-meta').textContent = m.count + ' item(s) · ' + m.total_frames +
+    ' frames · ' + m.duration_s.toFixed(1) + 's loop';
+}
+
+function renderRows(s){
+  const tb = $('#rows'), items = s.items;
+  $('#empty').style.display = items.length ? 'none' : 'block';
+  tb.innerHTML = items.map((it, i) => `
+    <tr class="${it.enabled ? '' : 'off'}" data-id="${it.id}">
+      <td>
+        <button title="move up" ${i === 0 ? 'disabled' : ''} data-act="up">↑</button>
+        <button title="move down" ${i === items.length - 1 ? 'disabled' : ''} data-act="down">↓</button>
+      </td>
+      <td><span class="thumb"><img data-act="big" src="/preview/${it.id}.png?scale=1&amp;v=${s.version}"
+           width="32" height="96" alt="${esc(it.title)}"></span></td>
+      <td>
+        <div class="name">${esc(it.title)}</div>
+        <div class="meta">${it.kind} · ${it.src} · ${(it.size/1048576).toFixed(1)} MB
+          · ${it.frames ?? '?'} frames · ${it.short}</div>
+      </td>
+      <td><select data-act="fit">${['letterbox','crop','stretch'].map(f =>
+        `<option ${f === it.fit ? 'selected' : ''}>${f}</option>`).join('')}</select></td>
+      <td><input type="number" data-act="dur" step="0.5" min="0" style="width:74px"
+           value="${it.duration}" title="${it.kind === 'image' ? 'seconds on screen'
+             : '0 = play once at natural length'}"></td>
+      <td><input type="checkbox" data-act="en" ${it.enabled ? 'checked' : ''}></td>
+      <td><button class="danger" data-act="del" title="delete">✕</button></td>
+    </tr>`).join('');
+}
+
+async function refresh(){
+  if (busy) return;
+  try {
+    const s = await api('/api/state');
+    const changed = !state || state.version !== s.version ||
+      JSON.stringify(state.items) !== JSON.stringify(s.items);
+    state = s;
+    renderHeader(s);
+    if (changed) renderRows(s);
+    renderControllers(s.driver && s.driver.controllers || []);
+  } catch (e) { /* the Pi will be back */ }
+}
+
+function renderControllers(list){
+  const el = $('#controllers');
+  if (!list.length){ el.innerHTML = '<div class="empty">nothing has announced itself</div>'; return; }
+  el.innerHTML = list.map(c => {
+    const cls = c.state === 'ok' ? 'ok' : c.state === 'unassigned' ? 'warn' : 'bad';
+    return `<div class="ctrl-row" data-mac="${c.mac}">
+      <span class="dot ${cls}"></span>
+      <span class="mono">${c.column === null ? '–' : 'col ' + c.column}</span>
+      <span class="mono" style="flex:1">${c.mac}</span>
+      <span class="meta">${c.fw || 'fw ?'} · ${c.ip || ''}</span>
+      <select data-act="col">
+        <option value="">unassigned</option>
+        ${[0,1,2,3].map(n => `<option value="${n}" ${c.column === n ? 'selected' : ''}>column ${n}</option>`).join('')}
+      </select>
+      <button data-act="ident" title="flash the status LED">Find</button>
+    </div>`;
+  }).join('');
+}
+
+// ---- events ---------------------------------------------------------
+
+$('#rows').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-act]'); if (!btn) return;
+  const tr = e.target.closest('tr'), id = tr.dataset.id, act = btn.dataset.act;
+  try {
+    if (act === 'up' || act === 'down')
+      await api(`/api/item/${id}/move`, jsonBody({delta: act === 'up' ? -1 : 1}));
+    else if (act === 'del') {
+      if (!confirm('Delete this item from the wall?')) return;
+      await api(`/api/item/${id}`, {method: 'DELETE'});
+    } else if (act === 'big') {
+      const it = state.items.find(x => x.id === id);
+      $('#big-title').textContent = it.title + ' — what the wall will show';
+      $('#big-img').src = (it.kind === 'image' ? `/preview/${id}.png?scale=4`
+                                               : `/preview/${id}.gif?scale=4`);
+      $('#dlg-big').showModal(); return;
+    } else return;
+    state = null; await refresh();
+  } catch (err) { alert(err.message); }
+});
+
+$('#rows').addEventListener('change', async e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const id = e.target.closest('tr').dataset.id, act = el.dataset.act;
+  busy = true;
+  try {
+    if (act === 'fit') await api(`/api/item/${id}/fit`, jsonBody({fit: el.value}));
+    if (act === 'dur') await api(`/api/item/${id}/duration`, jsonBody({duration: +el.value}));
+    if (act === 'en')  await api(`/api/item/${id}/enabled`, jsonBody({enabled: el.checked}));
+  } catch (err) { alert(err.message); }
+  finally { busy = false; state = null; refresh(); }
+});
+
+$('#controllers').addEventListener('change', async e => {
+  const row = e.target.closest('[data-mac]'); if (!row) return;
+  if (e.target.dataset.act !== 'col') return;
+  const v = e.target.value;
+  try { await api(`/api/controllers/${row.dataset.mac}/assign`,
+                  jsonBody({column: v === '' ? null : +v})); }
+  catch (err) { alert(err.message); }
+});
+$('#controllers').addEventListener('click', async e => {
+  const row = e.target.closest('[data-mac]'); if (!row) return;
+  if (e.target.dataset.act === 'ident')
+    await api(`/api/controllers/${row.dataset.mac}/identify`, {method: 'POST'});
+});
+
+function jsonBody(o){
+  return {method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(o)};
+}
+
+// upload
+const drop = $('#drop'), fileInput = $('#file');
+drop.onclick = () => fileInput.click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('hot'); };
+drop.ondragleave = () => drop.classList.remove('hot');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('hot'); upload(e.dataTransfer.files); };
+fileInput.onchange = () => upload(fileInput.files);
+
+async function upload(files){
+  if (!files || !files.length) return;
+  const fd = new FormData();
+  for (const f of files) fd.append('file', f);
+  fd.append('fit', $('#upfit').value);
+  msg($('#up-msg'), 'Decoding ' + files.length + ' file(s)… this can take a minute for video.', true);
+  busy = true;
+  try {
+    const r = await fetch('/api/upload', {method: 'POST', body: fd});
+    const j = await r.json();
+    if (j.errors && j.errors.length) msg($('#up-msg'), j.errors.join(' · '), false);
+    else msg($('#up-msg'), 'Added ' + j.added.length + ' item(s).', true);
+  } catch (e) { msg($('#up-msg'), e.message, false); }
+  finally { busy = false; state = null; fileInput.value = ''; refresh(); }
+}
+
+// compare
+$('#btn-compare').onclick = () => $('#dlg-cmp').showModal();
+$('#cmp-go').onclick = async () => {
+  let doc;
+  try { doc = JSON.parse($('#cmp-in').value); }
+  catch { return msg($('#cmp-msg'), 'That is not valid JSON.', false); }
+  $('#dlg-cmp').close();
+  try {
+    const r = await api('/api/compare', jsonBody(doc));
+    if (r.match) msg($('#cmp-msg'), 'Match. Both walls will show the same thing.', true);
+    else msg($('#cmp-msg'), 'Differs — ' + r.differences.join(' · '), false);
+  } catch (e) { msg($('#cmp-msg'), e.message, false); }
+};
+
+$('#btn-reload').onclick = async () => {
+  try { await api('/api/reload', {method: 'POST'});
+        msg($('#cmp-msg'), 'Driver told to reload.', true); }
+  catch (e) { alert(e.message); }
+};
+
+// live wall preview
+setInterval(() => { $('#now').src = '/now.png?scale=3&t=' + Date.now(); }, 1000);
+$('#now').src = '/now.png?scale=3';
+refresh(); setInterval(refresh, 2000);
+</script>
+</body>
+</html>

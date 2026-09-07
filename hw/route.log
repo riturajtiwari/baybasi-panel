@@ -1,0 +1,18 @@
+== export DSN ==
+  19 SMD GND pads tied to vias
+== route ==
+   3   passes default      ... 3 unrouted, 0 violations
+   3   passes default      ... 3 unrouted, 0 violations
+   10  passes default      ... 0 unrouted, 0 violations
+   best: 0 unrouted (config 10/-)
+== import + fill zones ==
+  widened 4 undersized track(s) to 0.25 mm
+  round 1: 3 island via(s) added
+  tracks: 549
+== verify ==
+Found 0 violations
+Found 0 unconnected items
+Saved DRC Report to drc.rpt
+  routed, zero errors, zero unconnected
+  warnings: 7  (drc-full.rpt)
+exit=0

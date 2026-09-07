@@ -1,0 +1,8 @@
+* text=auto
+*.csv -text
+*.kicad_pcb -text
+*.kicad_sch -text
+*.dsn -text
+*.ses -text
+*.net -text
+*.stl -text

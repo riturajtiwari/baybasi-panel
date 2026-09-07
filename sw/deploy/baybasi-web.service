@@ -1,0 +1,22 @@
+[Unit]
+Description=Baybasi upload utility
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=baybasi
+Group=baybasi
+WorkingDirectory=/opt/baybasi
+ExecStart=/opt/baybasi/.venv/bin/baybasi --config /opt/baybasi/config/wall.yaml --data /var/lib/baybasi web --http-port 8080
+Restart=always
+RestartSec=2
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/baybasi
+
+[Install]
+WantedBy=multi-user.target

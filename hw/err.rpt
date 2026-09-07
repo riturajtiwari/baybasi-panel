@@ -1,0 +1,33 @@
+** Drc report for baybasi-ctrl.kicad_pcb **
+** Created on 2026-09-06T16:53:16 **
+** Report includes: Errors **
+
+** Found 4 DRC violations **
+[track_width]: Track width (board setup constraints min width 0.2000 mm; actual 0.1874 mm)
+    Rule: netclass 'Default'; error
+    @(142.1559 mm, 130.2084 mm): Track [D12_5V] on F.Cu, length 1.5938 mm
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; 1 spokes connected to isolated island)
+    Local override; error
+    @(100.5000 mm, 50.5000 mm): Zone 'GND_POUR' [GND] on F.Cu and B.Cu, priority 0
+    @(141.7500 mm, 54.6000 mm): PTH pad 2 [GND] of J1
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
+    Local override; error
+    @(100.5000 mm, 50.5000 mm): Zone 'GND_POUR' [GND] on F.Cu and B.Cu, priority 0
+    @(135.5663 mm, 123.3873 mm): PTH pad 22 [GND] of A1
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; 1 spokes connected to isolated island)
+    Local override; error
+    @(100.5000 mm, 50.5000 mm): Zone 'GND_POUR' [GND] on F.Cu and B.Cu, priority 0
+    @(158.4300 mm, 70.0500 mm): PTH pad 44 [GND] of A1
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **

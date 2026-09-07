@@ -1,0 +1,39 @@
+** Drc report for baybasi-ctrl.kicad_pcb **
+** Created on 2026-09-07T01:58:22 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 7 DRC violations **
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(150.9500 mm, 56.2300 mm): Footprint J2
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(141.7500 mm, 56.2300 mm): Footprint J1
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(106.3300 mm, 89.0400 mm): Footprint J13
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(178.5500 mm, 56.2300 mm): Footprint J5
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(187.7500 mm, 56.2300 mm): Footprint J6
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(169.3500 mm, 56.2300 mm): Footprint J4
+[lib_footprint_mismatch]: Footprint 'TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal' does not match copy in library 'TerminalBlock_Phoenix'
+    Local override; warning
+    @(160.1500 mm, 56.2300 mm): Footprint J3
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **
