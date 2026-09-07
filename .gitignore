@@ -20,7 +20,7 @@ fw/.pio/
 hw/*.lck
 hw/~*
 hw/*.bak
-hw/*.pre-qa
+hw/*.pre-qa*
 hw/fp-info-cache
 hw/*-backups/
 
