@@ -146,6 +146,34 @@ laptop or phone on the same network.
   must be uploaded to each Pi in turn. Make that a first-class flow and show a
   checksum or manifest so a mismatch between the two walls is obvious.
 
+### Commissioning, which also lives in the utility
+
+The MAC-to-column table has to be editable by a person, and this is where that
+happens. Without it the boards are provisioned by editing a file over SSH, which
+is exactly the job that gets done wrong on a ladder at 11 p.m.
+
+- **Discover unprovisioned boards.** There is no DHCP on the pixel segment, so
+  discovery cannot lean on it. Have an unassigned board announce itself with a
+  UDP beacon carrying its factory MAC and firmware version, and have the utility
+  listen. Show MAC, firmware, assigned column, last seen, and whether it is
+  currently receiving frames.
+- **Assign, reassign and clear** a column for a MAC. Four columns, four boards.
+- **Refuse duplicate assignments.** Two boards claiming the same column is the
+  failure that silently duplicates a quarter of the image, and it looks like a
+  content bug rather than a wiring one. Block it, do not warn about it.
+- **Identify a board physically.** A button that makes the selected board flood
+  its whole column white, or blink its status LED. Behind the wall there are four
+  identical boxes and a MAC tells you nothing about which is which. This one
+  control is the difference between ten minutes of commissioning and an hour.
+- **Survive a swap.** Replace a board, its new MAC appears unassigned, assign it
+  the same column, done. No reflash, no rebuild.
+
+**The MAC table is the one thing that must NOT be copied between the two Pis.**
+Media and playlist have to be byte-identical across both displays; the board
+assignments are per-display, because they name different physical hardware.
+Whatever you build for pushing content to both walls must exclude this table,
+and it is worth a test that proves it does.
+
 ## Deliverable 3: the controller firmware
 
 Arduino framework or ESP-IDF, your call.

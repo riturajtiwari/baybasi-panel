@@ -1,0 +1,141 @@
+# Baybasi pixel wall - geometry and wire map.
+#
+# Everything here is data on purpose.  When the wall is up and row 7 of column 2
+# is showing row 8's picture, you fix it by editing this file and restarting the
+# driver.  Nothing in this file requires a code change to correct.
+#
+# One file per display.  Both displays are identical, so both Pis use this same
+# file - see manifest checksums in the upload utility for keeping them in step.
+
+wall:
+  width: 64          # 4 columns x 16
+  height: 192        # 12 rows x 16
+
+panel:
+  width: 16
+  height: 16
+
+  # How the 256 LEDs inside one panel are chained.
+  #
+  #   axis: column   -> the strand runs along y, moving one column of x at a time
+  #   start: top_left-> LED 0 is at local (0, 0) and the first run goes downward
+  #   serpentine: true -> every other run is reversed
+  #
+  # Together these reproduce the mapping verified against the team's earlier code:
+  #     local = x * 16 + (y if x % 2 == 0 else 15 - y)
+  chain:
+    axis: column
+    start: top_left
+    serpentine: true
+
+# Channel order on the wire.
+#
+# The WS2812B itself is 24-bit GRB, MSB first, but that is a property of the LED,
+# not of the link.  DDP's data-type byte declares RGB, so the Pi sends RGB and
+# the firmware reorders on the way into the strand buffer (one flag,
+# LED_ORDER_GRB in fw/src/config.h).  That keeps a packet capture and any
+# third-party DDP tool honest, and costs the controller nothing.
+#
+# If you would rather the Pi did the reorder, set this to GRB and set
+# LED_ORDER_GRB to 0 in the firmware.  Exactly one of the two must swap.
+# `baybasi pattern bars` tells you which way round you are in one look: the
+# top band is red.
+color_order: RGB
+
+# Image pipeline.  Gamma and brightness are applied on the Pi, in 16 bit,
+# then dithered to 8 bit.
+render:
+  fps: 30
+  gamma: 2.2
+  brightness: 0.5      # 0.0 .. 1.0, applied after gamma, before dither
+  dither: bayer8       # bayer8 | none
+  # Fixed wall-clock epoch shared by BOTH displays.  Changing it desynchronises
+  # them until both Pis are updated.  Unix seconds.
+  epoch: 1767225600    # 2026-01-01T00:00:00Z
+
+network:
+  # Both displays use this same subnet.  They never see each other.
+  broadcast: 192.168.50.255
+  ddp_port: 4048
+  control_port: 4049
+  pixels_per_packet: 480   # 1440 data bytes + 10 header = 1450, under 1472
+  # DDP destination id.  Each controller answers to its own id and to 255.
+  # Per-controller ids also let one software sink demultiplex all four columns
+  # from a single socket - see sw/README.md.
+  id_mode: per_controller  # per_controller | default
+
+# One entry per controller board.  `column` is which 16-px-wide column of the
+# wall it drives.  `panels` maps a wall row to a physical output D1..D12 on that
+# board; the wire layout is by OUTPUT number, so output N owns bytes
+# [(N-1)*768, N*768) of that controller's 9216-byte buffer.
+#
+# `transform` rotates or mirrors an individual panel, for the one that got
+# mounted upside down.  none | rot90 | rot180 | rot270 | flipx | flipy
+controllers:
+  - column: 0
+    ip: 192.168.50.11
+    ddp_id: 1
+    panels:
+      - {row: 0,  output: 1}
+      - {row: 1,  output: 2}
+      - {row: 2,  output: 3}
+      - {row: 3,  output: 4}
+      - {row: 4,  output: 5}
+      - {row: 5,  output: 6}
+      - {row: 6,  output: 7}
+      - {row: 7,  output: 8}
+      - {row: 8,  output: 9}
+      - {row: 9,  output: 10}
+      - {row: 10, output: 11}
+      - {row: 11, output: 12}
+
+  - column: 1
+    ip: 192.168.50.12
+    ddp_id: 11
+    panels:
+      - {row: 0,  output: 1}
+      - {row: 1,  output: 2}
+      - {row: 2,  output: 3}
+      - {row: 3,  output: 4}
+      - {row: 4,  output: 5}
+      - {row: 5,  output: 6}
+      - {row: 6,  output: 7}
+      - {row: 7,  output: 8}
+      - {row: 8,  output: 9}
+      - {row: 9,  output: 10}
+      - {row: 10, output: 11}
+      - {row: 11, output: 12}
+
+  - column: 2
+    ip: 192.168.50.13
+    ddp_id: 12
+    panels:
+      - {row: 0,  output: 1}
+      - {row: 1,  output: 2}
+      - {row: 2,  output: 3}
+      - {row: 3,  output: 4}
+      - {row: 4,  output: 5}
+      - {row: 5,  output: 6}
+      - {row: 6,  output: 7}
+      - {row: 7,  output: 8}
+      - {row: 8,  output: 9}
+      - {row: 9,  output: 10}
+      - {row: 10, output: 11}
+      - {row: 11, output: 12}
+
+  - column: 3
+    ip: 192.168.50.14
+    ddp_id: 13
+    panels:
+      - {row: 0,  output: 1}
+      - {row: 1,  output: 2}
+      - {row: 2,  output: 3}
+      - {row: 3,  output: 4}
+      - {row: 4,  output: 5}
+      - {row: 5,  output: 6}
+      - {row: 6,  output: 7}
+      - {row: 7,  output: 8}
+      - {row: 8,  output: 9}
+      - {row: 9,  output: 10}
+      - {row: 10, output: 11}
+      - {row: 11, output: 12}
