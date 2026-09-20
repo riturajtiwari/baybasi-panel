@@ -176,6 +176,24 @@ Upload `baybasi-ctrl-<date>-gerbers.zip` and take the defaults except where note
 | `drc-full.rpt` | last DRC including warnings |
 
 
+## Panel power stays off this board - DECIDED 2026-09-20
+
+Settled: the board carries DATA and GND only. Panel +5 V is run separately
+from the supply, and the red conductor in every JST-SM lead stays cut and
+capped at both ends. The alternative considered was a co-routed
+power+data cable out of the board, three conductors per panel.
+
+Rejected on current. Twelve panels at full white is 12 x 15.4 A = 184 A. Even
+a fraction of that has no business crossing a 2-layer signal board, its
+terminal blocks or its ground pour. Keeping the two apart means the board's
+GND connection is a signal reference tap and nothing else, which is also why
+it is mounted mid-column: the tap lands in the middle of the column's ground
+bus rather than at one end.
+
+Consequence for the build: every panel needs a power drop from the riser as
+well as a data lead from the board. That is more wiring, and it is the right
+trade. See the power-riser design for the distribution.
+
 ## Devkit header pitch - batch 1 vs batch 2 (2026-09-15)
 
 A1L/A1R are fitted at **22.86 mm (0.900 in)**. **CONFIRMED from Espressif's own

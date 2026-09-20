@@ -68,8 +68,15 @@ channel order (`CHANNEL_MAP = {2,0,1}`, measured).
    terminal each if wanted. Original note: Needs both devkit rows, so either the 14 breadboard
    jumpers (table in `hw/BRINGUP.md` step 6) or a devkit with headers soldered
    in the board as a jig.
-7. **Batch 2 PCB**: move A1L/A1R to 25.4 mm, and decide the co-routed
-   power+data cable question (see the power riser artifact).
+7. **Batch 2 PCB.** Now a ONE-LINE change: A1L/A1R 22.86 -> 25.4 mm in
+   `gen_pcb.py`. The co-routed power+data question is DECIDED 2026-09-20 -
+   panel power stays off the board, run separately; see FABRICATION.md. All
+   seven defects from the deep QA are already in revA, and U1, U2, A1L and
+   A1R are all proven on hardware, so nothing else needs to change.
+
+   Before ordering: record the exact devkit vendor and part number in
+   FABRICATION.md. Once the board is cut for 25.4, a reorder that quietly
+   ships a different pitch puts you straight back into the socket problem.
 
 ## Traps that cost real time tonight
 
