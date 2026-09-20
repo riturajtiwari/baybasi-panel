@@ -279,12 +279,41 @@ def cmd_discover(args) -> int:
 
 
 def cmd_assign(args) -> int:
+    from .control import ControlPlane, DuplicateColumn
+    wall = _wall(args)
+    cp = ControlPlane(wall, table_path=Path(args.data) / "controllers.json",
+                      listen=False)
+    try:
+        ok = cp.assign(args.mac, args.column, force=args.force)
+    except DuplicateColumn as e:
+        print(f"refused: {e}")
+        return 2
+    print(f"assign {args.mac} -> column {args.column}: {'sent' if ok else 'FAILED'}")
+    return 0 if ok else 1
+
+
+def cmd_identify(args) -> int:
+    """Make one board show itself. The step commissioning cannot be done
+    without: discover gives you MACs, and a MAC does not tell you which of
+    four identical boxes behind the wall it is."""
     from .control import ControlPlane
     wall = _wall(args)
     cp = ControlPlane(wall, table_path=Path(args.data) / "controllers.json",
                       listen=False)
-    ok = cp.assign(args.mac, args.column)
-    print(f"assign {args.mac} -> column {args.column}: {'sent' if ok else 'FAILED'}")
+    ok = cp.identify(args.mac, args.seconds)
+    print(f"identify {args.mac} for {args.seconds}s: "
+          f"{'sent - watch the wall' if ok else 'FAILED'}")
+    return 0 if ok else 1
+
+
+def cmd_clear(args) -> int:
+    """Take a board's column away. It reboots and comes back unassigned."""
+    from .control import ControlPlane
+    wall = _wall(args)
+    cp = ControlPlane(wall, table_path=Path(args.data) / "controllers.json",
+                      listen=False)
+    ok = cp.unassign(args.mac)
+    print(f"clear {args.mac}: {'sent, board will reboot unassigned' if ok else 'FAILED'}")
     return 0 if ok else 1
 
 
@@ -539,9 +568,21 @@ def build_parser() -> argparse.ArgumentParser:
     disc.add_argument("--seconds", type=float, default=30)
     disc.set_defaults(func=cmd_discover)
 
+    idf = sub.add_parser("identify",
+                         help="flash a board's column so you can see which it is")
+    idf.add_argument("mac")
+    idf.add_argument("--seconds", type=int, default=5)
+    idf.set_defaults(func=cmd_identify)
+
+    clr = sub.add_parser("clear", help="take a board's column away")
+    clr.add_argument("mac")
+    clr.set_defaults(func=cmd_clear)
+
     asg = sub.add_parser("assign", help="give a board its column")
     asg.add_argument("mac")
     asg.add_argument("column", type=int)
+    asg.add_argument("--force", action="store_true",
+                     help="move the column off whichever board holds it now")
     asg.set_defaults(func=cmd_assign)
 
     o = sub.add_parser("ota", help="push firmware to the boards over Ethernet")

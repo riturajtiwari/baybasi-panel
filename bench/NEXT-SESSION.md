@@ -43,18 +43,29 @@ channel order (`CHANNEL_MAP = {2,0,1}`, measured).
    - The wait is ROLLING, not boot-time. The first version armed once at boot;
      a board that got a lease and then lost it sat at 0.0.0.0 for ever and
      needed a power cycle. That was caught on hardware, not in review.
-2. **Commission this board.** `baybasi assign ae:27:6e:a5:83:8d 0`. Retires the
+2. **Commissioning is now usable.** DONE 2026-09-19: `baybasi identify <mac>`
+   and `baybasi clear <mac>` exist (both were implemented in ControlPlane and
+   unreachable), identify floods the whole column at 2 Hz instead of blinking
+   a 2 mm LED inside an enclosure, and a second board can no longer be given a
+   column that another board holds. Confirmed on hardware: 12 flashes in 6 s,
+   8 in 4 s.
+
+   Install-day plan: commission each board on the BENCH where you can see it
+   and put a physical label on it. Keep identify for field recovery - a board
+   swapped out, or a label that fell off.
+
+3. **Commission this board.** `baybasi assign ae:27:6e:a5:83:8d 0`. Retires the
    `bench/wall-bench.yaml` ddp_id hack. It reboots onto 192.168.50.11, so this
    also means moving to the pixel-segment addressing.
-3. **Strip the debug instrumentation from `fw/src/main.cpp`** - loop counters,
+4. **Strip the debug instrumentation from `fw/src/main.cpp`** - loop counters,
    `acquire()` null counter, show() timing. Earned its keep; noise now.
-4. **Real media end to end.** `flow` proves synthetic frames; the actual use
+5. **Real media end to end.** `flow` proves synthetic frames; the actual use
    case is video and images through `baybasi add` / `driver`. That exercises
    decode, scaling and the playlist, none of which have touched hardware.
-5. **Outputs J4-J12.** Needs both devkit rows, so either the 14 breadboard
+6. **Outputs J4-J12.** Needs both devkit rows, so either the 14 breadboard
    jumpers (table in `hw/BRINGUP.md` step 6) or a devkit with headers soldered
    in the board as a jig.
-6. **Batch 2 PCB**: move A1L/A1R to 25.4 mm, and decide the co-routed
+7. **Batch 2 PCB**: move A1L/A1R to 25.4 mm, and decide the co-routed
    power+data cable question (see the power riser artifact).
 
 ## Traps that cost real time tonight

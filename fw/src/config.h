@@ -61,6 +61,21 @@ static constexpr uint16_t CTRL_PORT = 4049;   // announce / assign / OTA
 static constexpr uint32_t SIGNAL_TIMEOUT_MS = 500;
 static constexpr uint32_t FADE_MS           = 600;
 static constexpr uint32_t ANNOUNCE_MS       = 2000;
+
+// ---- identify -------------------------------------------------------------
+// "Which board am I." Behind a wall, the on-board status LED is a 2 mm dot
+// inside an enclosure mid-column; the thing an operator can actually see from
+// the floor is the column itself lighting up. So identify floods all twelve
+// outputs, blinking.
+//
+// NOT full white. A column at full white is 12 x 256 x 60 mA = 184 A, which no
+// supply in this design can deliver and which would brown out or trip the
+// segment - during commissioning, when someone is up a ladder. At 40/255 the
+// same column draws about 29 A peak, comparable to bright content, and a
+// 16 x 192 white column is unmistakable at that level.
+static constexpr uint8_t  IDENTIFY_LEVEL      = 40;
+static constexpr uint32_t IDENTIFY_BLINK_MS   = 250;   // 2 Hz, clearly manual
+static constexpr uint32_t IDENTIFY_DEFAULT_MS = 5000;
 static constexpr uint32_t IDLE_REFRESH_MS   = 40;    // keep showing while idle
 
 // ---- addressing before a board is commissioned ----------------------------

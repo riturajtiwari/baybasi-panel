@@ -87,6 +87,19 @@ void show(const uint8_t *frame) {
 // already blocks, so by the time anyone calls this there is nothing to wait for.
 void waitDone() {}
 
+void solid(uint8_t r, uint8_t g, uint8_t b) {
+    // Through CHANNEL_MAP like every other path. White is order-independent
+    // so this looks unnecessary today, and would be a silent trap the first
+    // time someone makes identify a colour.
+    for (size_t i = 0; i < (size_t)NUM_LEDS; i++) {
+        uint8_t *px = g_scratch + i * 3;
+        px[CHANNEL_MAP[0]] = r;
+        px[CHANNEL_MAP[1]] = g;
+        px[CHANNEL_MAP[2]] = b;
+    }
+    FastLED.show();
+}
+
 void enableOutputs() {
     if (g_enabled) return;
     digitalWrite(PIN_OE, LOW);

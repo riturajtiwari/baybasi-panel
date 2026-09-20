@@ -23,6 +23,7 @@ void set(State s) { g_state = s; }
 State get() { return g_state; }
 
 void identify(uint32_t ms) { g_identifyUntil = millis() + ms; }
+bool identifying() { return (int32_t)(g_identifyUntil - millis()) > 0; }
 
 void tick() {
     const uint32_t now = millis();

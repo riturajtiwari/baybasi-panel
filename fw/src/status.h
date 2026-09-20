@@ -26,6 +26,9 @@ void begin();
 void set(State s);
 State get();
 void identify(uint32_t ms);
+// True while an identify is running. main.cpp uses this to take over the
+// panels, which is the part an operator can see.
+bool identifying();
 void tick();   // call from loop()
 
 }  // namespace status

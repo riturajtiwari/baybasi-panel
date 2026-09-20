@@ -51,6 +51,7 @@ uint32_t g_tornAtLastCheck = 0;
 // overflow uint32 after about eight hours of running and then report nonsense.
 uint32_t g_showMaxUs = 0, g_showSumUs = 0, g_showN = 0;
 uint32_t g_loops = 0, g_loopsAtLog = 0, g_lastLogMs = 0, g_acqNull = 0;
+bool g_identifyOn = false, g_wasIdentifying = false;
 
 void logSummary() {
     const ddp::Stats &s = ddp::stats();
@@ -75,6 +76,23 @@ void logSummary() {
           (unsigned long)(g_showN ? g_showSumUs / g_showN : 0),
           (unsigned long)g_showMaxUs);
     g_showN = 0; g_showSumUs = 0; g_showMaxUs = 0;
+}
+
+// Flood every output, blinking, for as long as the identify lasts. This
+// deliberately overrides content: a board being identified is one nobody is
+// watching content on, and half-measures are not visible from a ladder.
+//
+// leds::solid() paints the driver's own buffer, so none of this touches the
+// frame assembler. DDP keeps arriving and keeps assembling underneath; we
+// simply do not show it, and the first frame after identify repaints
+// everything.
+void identifyTick(uint32_t now) {
+    if (now - g_lastShow < IDENTIFY_BLINK_MS) return;
+    g_lastShow = now;
+    g_identifyOn = !g_identifyOn;
+    leds::enableOutputs();
+    const uint8_t v = g_identifyOn ? IDENTIFY_LEVEL : 0;
+    leds::solid(v, v, v);
 }
 
 void updateStatus() {
@@ -134,6 +152,26 @@ void loop() {
     // blocks for seconds and reboots the board when it succeeds.
     String url, sha;
     if (control::otaRequested(url, sha)) ota::update(url, sha);
+
+    // ---- identify overrides everything ------------------------------------
+    const bool identifying = status::identifying();
+    if (identifying) {
+        g_wasIdentifying = true;
+        identifyTick(now);
+        updateStatus();
+        delay(1);
+        return;
+    }
+    if (g_wasIdentifying) {
+        // Leave the column dark rather than frozen on whichever half of the
+        // blink it happened to end on. If content is flowing the next frame
+        // repaints immediately; if it is not, dark is the honest state.
+        g_wasIdentifying = false;
+        leds::solid(0, 0, 0);
+        g_lastShow = now;
+        g_fadeStarted = 0;
+        g_faded = true;
+    }
 
     // ---- a new complete frame -------------------------------------------
     const uint8_t *frame = frames.acquire();

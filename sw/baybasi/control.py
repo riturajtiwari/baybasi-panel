@@ -75,6 +75,19 @@ class ControllerInfo:
         return d
 
 
+class DuplicateColumn(Exception):
+    """Two boards would drive the same column."""
+
+    def __init__(self, column: int, holder: str, claimant: str):
+        self.column, self.holder, self.claimant = int(column), holder, claimant
+        super().__init__(
+            f"column {column} already belongs to {holder}; assigning it to "
+            f"{claimant} as well would make two boards render the same quarter "
+            f"of the wall. Re-run with --force to move it, which first tells "
+            f"{holder} to let go."
+        )
+
+
 class AssignmentTable:
     """The Pi's MAC-to-column table.  Survives OTA because OTA never sees it."""
 
@@ -99,12 +112,35 @@ class AssignmentTable:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         _atomic_write(self.path, json.dumps(self.map, indent=1, sort_keys=True).encode())
 
-    def set(self, mac: str, column: int) -> None:
+    def holder_of(self, column: int) -> Optional[str]:
+        """Which MAC currently owns this column, if any."""
+        for mac, col in self.map.items():
+            if col == int(column):
+                return mac
+        return None
+
+    def set(self, mac: str, column: int, *, force: bool = False) -> None:
+        """Bind a MAC to a column.
+
+        Refuses to take a column off another board unless forced. It used to
+        do it silently with a log line, which is the wrong shape for this
+        failure: deleting the old MAC here only updates the Pi's table, while
+        the old BOARD still has that column in its NVS and keeps driving it.
+        Two boards then render the same quarter of the wall, the image is
+        duplicated, and it reads as a content bug rather than a wiring one -
+        the single most expensive way to get this wrong.
+
+        ControlPlane.assign() is what passes force=True, and only after it has
+        told the old board to let go.
+        """
         mac = mac.lower()
-        for other, col in list(self.map.items()):
-            if col == column and other != mac:
-                log.warning("column %d was %s, now %s", column, other, mac)
-                del self.map[other]
+        holder = self.holder_of(column)
+        if holder and holder != mac and not force:
+            raise DuplicateColumn(column, holder, mac)
+        if holder and holder != mac:
+            log.warning("column %d taken from %s and given to %s",
+                        column, holder, mac)
+            del self.map[holder]
         self.map[mac] = int(column)
         self.save()
 
@@ -246,10 +282,23 @@ class ControlPlane(threading.Thread):
             log.warning("control send to %s failed: %s", target, exc)
             return False
 
-    def assign(self, mac: str, column: int) -> bool:
-        """Give a board its column.  Persisted on the Pi and in the board's NVS."""
+    def assign(self, mac: str, column: int, *, force: bool = False) -> bool:
+        """Give a board its column.  Persisted on the Pi and in the board's NVS.
+
+        Raises DuplicateColumn if another board already holds it. With
+        force=True the old board is told to release it FIRST - clearing only
+        the Pi's table would leave that board still driving the column from
+        its own NVS.
+        """
         ctrl = self.wall.controller_by_column(column)
-        self.table.set(mac, column)
+        holder = self.table.holder_of(column)
+        if holder and holder != mac.lower():
+            if not force:
+                raise DuplicateColumn(column, holder, mac.lower())
+            log.warning("releasing column %d from %s before reassigning",
+                        column, holder)
+            self.unassign(holder)
+        self.table.set(mac, column, force=force)
         with self._lock:
             info = self.seen.get(mac.lower())
             if info:

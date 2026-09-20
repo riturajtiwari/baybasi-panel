@@ -34,6 +34,11 @@ void disableOutputs();
 bool outputsEnabled();
 
 // Fade the held frame towards black.  Called while no packets are arriving.
+// Paint every output one colour, straight into the driver's own buffer. No
+// caller-side frame needed, so identify does not have to borrow - and then
+// corrupt - the frame assembler's held buffer.
+void solid(uint8_t r, uint8_t g, uint8_t b);
+
 void fadeStep(uint8_t *frame, uint8_t shift);
 void blackOut(uint8_t *frame);
 

@@ -95,6 +95,11 @@ void onPacket(AsyncUDPPacket &pkt) {
         const int secs = field(doc, "s").toInt();
         status::identify((uint32_t)max(1, secs) * 1000);
         ack("identify", true);
+        // Worth a line. Without it the only evidence identify ran is a dip in
+        // the acquire() null counter, which is a poor thing to have to infer
+        // from when someone is asking "did that board answer or not".
+        log_i("identify for %d s: flooding all %d outputs at level %u",
+              max(1, secs), NUM_OUTPUTS, (unsigned)IDENTIFY_LEVEL);
         return;
     }
 
