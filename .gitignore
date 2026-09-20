@@ -13,8 +13,8 @@ sw/data/
 sw/render/
 sw/sink-frames/
 
-# PlatformIO build output
-fw/.pio/
+# PlatformIO build output (fw/ and fw-bench/)
+.pio/
 
 # KiCad locks, backups and superseded files
 hw/*.lck
