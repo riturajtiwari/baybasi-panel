@@ -176,7 +176,7 @@ class ControlPlane(threading.Thread):
                 continue
             except OSError:
                 break
-            self._handle(raw, addr[0])
+            self._on_message(raw, addr[0])
 
     def stop(self) -> None:
         self._stop.set()
@@ -188,7 +188,13 @@ class ControlPlane(threading.Thread):
 
     # ---- inbound -------------------------------------------------------
 
-    def _handle(self, raw: bytes, src_ip: str) -> None:
+    # NOT _handle(). threading.Thread gained a `_handle` attribute in Python
+    # 3.13 (a _thread._ThreadHandle, assigned during start()), which shadows a
+    # subclass method of that name. The receive thread then dies on its first
+    # packet with "'_thread._ThreadHandle' object is not callable" - and
+    # `discover`'s screen-clearing output wipes the traceback, so it just looks
+    # like nothing is announcing. Works on 3.12, fails on 3.13. Found 2026-09-19.
+    def _on_message(self, raw: bytes, src_ip: str) -> None:
         try:
             msg = json.loads(raw.decode("utf-8", "replace"))
         except json.JSONDecodeError:

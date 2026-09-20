@@ -34,8 +34,10 @@ def test_every_pattern_survives_the_wire_byte_for_byte(wall, loop):
     got = []
     loop.on_frame = got.append
     pipe = Pipeline(wall, gamma=1.0, brightness=1.0, dither="none")
-    sent = [patterns.build(n, wall).frame(11)
-            for n in ("id", "strand", "scroll", "chase", "bars")]
+    # Every registered pattern, not a hand-listed subset: a new pattern is
+    # then covered the moment it lands in BUILDERS instead of whenever someone
+    # remembers to extend this tuple.
+    sent = [patterns.build(n, wall).frame(11) for n in patterns.NAMES]
     with DDPSender(wall, pipeline=pipe, broadcast="127.0.0.1") as tx:
         _send_and_settle(tx, loop, sent)
     loop.flush()

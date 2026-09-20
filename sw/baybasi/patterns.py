@@ -211,6 +211,110 @@ class Bars(Pattern):
         return f
 
 
+class Flow(Pattern):
+    """Full-frame motion in saturated colour: the video-rate bench test.
+
+    Every pixel changes every frame, which is the honest worst case for the
+    wire, the framebuffer and the LED driver. A mostly-black or mostly-static
+    pattern proves far less.
+
+    The hue wheel completes once every THREE panels, so at any instant J1, J2
+    and J3 sit 120 degrees apart - red-ish, green-ish, blue-ish - and you can
+    tell at a glance that neighbouring outputs are slices of one image rather
+    than twelve independent displays. The whole field scrolls, so each panel
+    also cycles through the wheel over about six seconds.
+
+    Saturation is full. An earlier version built each channel as
+    sin()*0.5+0.5, which never lets a channel reach zero: the three always sum
+    to ~1.5 and everything comes out pastel, then a white band washed out what
+    was left. On a camera it read as green-and-white mush. Proper HSV instead.
+    """
+
+    name = "flow"
+    period = 0          # continuous; driven off the frame clock
+    HUE_SPAN_PX = 48    # one full wheel every three 16 px panels
+
+    def frame(self, i: int) -> np.ndarray:
+        h, w = self.wall.height, self.wall.width
+        y = np.arange(h, dtype=np.float32)[:, None]
+        x = np.arange(w, dtype=np.float32)[None, :]
+
+        # Hue scrolls down the wall; a slight x term keeps the motion diagonal
+        # so no column is ever a repeat of its neighbour.
+        hue = (y / self.HUE_SPAN_PX + x * 0.004 - i / 180.0) % 1.0
+
+        # Brightness wave, so pixels keep changing even where the hue barely
+        # moves. Never reaches zero - a dark panel proves nothing.
+        val = 0.70 + 0.30 * np.sin(y * 0.35 + x * 0.22 - i * 0.22)
+
+        # Fully saturated HSV -> RGB, vectorised.
+        k = hue * 6.0
+        seg = np.floor(k).astype(np.int32) % 6
+        f6 = k - np.floor(k)
+        one, zero = np.ones_like(hue), np.zeros_like(hue)
+        conds = [seg == n for n in range(6)]
+        r = np.select(conds, [one, 1.0 - f6, zero, zero, f6, one])
+        g = np.select(conds, [f6, one, one, 1.0 - f6, zero, zero])
+        b = np.select(conds, [zero, zero, f6, one, one, 1.0 - f6])
+
+        f = np.stack((r, g, b), axis=-1) * val[:, :, None]
+        return (np.clip(f, 0.0, 1.0) * 255.0).astype(np.uint8)
+
+
+class Ident(Pattern):
+    """Locked hue per output, full-frame motion.  The jumper-swap test.
+
+    ``flow`` scrolls the hue, so a panel runs the whole colour wheel in about
+    six seconds.  That is what you want from a video test and exactly what you
+    do not want when the test method is "unplug the lead from J1, plug it into
+    J2, compare": moving a JST connector takes longer than six seconds, so both
+    panels have been every colour by the time you look.  Identity has to be
+    stable to be an identity.
+
+    So here the hue is a pure function of the output number and never moves.
+    The motion lives in brightness instead, which keeps the honest part of the
+    test - every pixel changes every frame, so the wire, the framebuffer and
+    the driver all still carry a full-rate stream.
+
+    The hue stride is 5/12 of the wheel, not 1/12.  Twelve steps of 5 still
+    visit all twelve hues (5 and 12 are coprime) but put ADJACENT outputs 150
+    degrees apart, so the pairs you actually compare on the bench - J1 vs J2,
+    J2 vs J3 - are near-opposites rather than neighbouring shades.
+
+    Each panel also carries its output number as that many white pixels along
+    the top edge, so a photograph of one panel is self-identifying.
+    """
+
+    name = "ident"
+    period = 0          # continuous; driven off the frame clock
+    HUE_STRIDE = 5, 12  # coprime: all 12 distinct, adjacent ones 150 deg apart
+
+    def frame(self, i: int) -> np.ndarray:
+        f = self.blank()
+        pw, ph = self.wall.panel_w, self.wall.panel_h
+        stride, n = self.HUE_STRIDE
+
+        # Brightness wave, shared by the whole wall so the panels stay phase
+        # locked to each other.  0.25 .. 1.0: strong contrast, never dead.
+        yy = np.arange(self.wall.height, dtype=np.float32)[:, None]
+        xx = np.arange(self.wall.width, dtype=np.float32)[None, :]
+        val = 0.625 + 0.375 * np.sin(yy * 0.30 + xx * 0.30 - i * 0.18)
+
+        for ctrl in self.wall.controllers:
+            c = ctrl.column
+            for panel in ctrl.panels:
+                x0, y0 = c * pw, panel.row * ph
+                rgb = np.array(
+                    _hue((panel.output - 1) * stride, n), dtype=np.float32
+                )
+                tile = val[y0 : y0 + ph, x0 : x0 + pw, None] * rgb
+                f[y0 : y0 + ph, x0 : x0 + pw] = tile.astype(np.uint8)
+                # Output identity: that many white pixels along the top edge.
+                # Twelve fits inside a 16 px panel with room to spare.
+                f[y0, x0 + 1 : x0 + 1 + panel.output] = (255, 255, 255)
+        return f
+
+
 class Gray(Pattern):
     """Vertical grey ramp.  Banding here means gamma or dither is wrong."""
 
@@ -246,6 +350,8 @@ BUILDERS: Dict[str, Callable[..., Pattern]] = {
     "scroll": ScrollLine,
     "chase": Chase,
     "bars": Bars,
+    "flow": Flow,
+    "ident": Ident,
     "gray": Gray,
     "solid": Solid,
 }
