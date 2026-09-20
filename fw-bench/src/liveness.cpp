@@ -8,9 +8,14 @@
 //
 // Wiring, and the order matters:
 //
-//   devkit 5V   -> panel +5 V (red)
-//   devkit GND  -> panel GND  (white)      <- connect this FIRST, remove LAST
-//   devkit 4    -> panel DIN  (green)
+//   devkit 14    -> panel DIN  (green)
+//   devkit 5Vin  -> panel +5 V (red)
+//   devkit GND   -> panel GND  (white)     <- connect FIRST, remove LAST
+//
+// Contiguous at the bottom of the left header, in the order DATA / 5V / GND.
+// A standard WS2812 lead has DATA in the middle, so the test lead is
+// deliberately re-ordered to come out right at the panel. LABEL IT - it is
+// wired differently from every other lead in this project.
 //
 // GND first and out last is not fussiness. Data into a panel whose 5 V is off
 // back-powers it through the DIN clamp diode and sinks the whole panel's
@@ -59,7 +64,7 @@
 #include <FastLED.h>
 
 #ifndef LED_PIN
-#define LED_PIN 4
+#define LED_PIN 14
 #endif
 #ifndef PANEL_LEDS
 #define PANEL_LEDS 256
