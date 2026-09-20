@@ -82,6 +82,17 @@
 #define STATUS_LED 48
 #endif
 
+// Built two ways:
+//
+//   bare devkit      one GPIO straight into DIN, no level shifter. 3.3 V into
+//                    a part that wants 0.7*VDD, so marginal by design.
+//   controller board OE_PIN defined. Outputs go through the SN74AHCT245s and
+//                    come out at a proper 5 V, which removes the marginal
+//                    signalling entirely - a panel that fails THIS build has
+//                    really failed. Only D1-D3 (J1-J3) are reachable with the
+//                    devkit half-seated in A1L, and all three carry the same
+//                    pattern so any jumper will do.
+
 namespace {
 
 CRGB g_leds[PANEL_LEDS];
@@ -157,13 +168,44 @@ void setup() {
     Serial.begin(115200);
     delay(400);
 
+#ifdef OE_PIN
+    // HIGH first: the '245s stay high-impedance until there is a known frame
+    // in the buffer, so the panels never latch whatever powered up in there.
+    pinMode(OE_PIN, OUTPUT);
+    digitalWrite(OE_PIN, HIGH);
+#endif
+
+#ifdef CTRL_OUTPUTS
+    // D1, D2, D3 -> J1, J2, J3, all fed from ONE buffer, so the same pattern
+    // comes out of all three. Plug into whichever jumper is convenient, or
+    // hang three panels off it and check three at a time.
+    FastLED.addLeds<WS2812B, 4, GRB>(g_leds, PANEL_LEDS);
+    FastLED.addLeds<WS2812B, 5, GRB>(g_leds, PANEL_LEDS);
+    FastLED.addLeds<WS2812B, 6, GRB>(g_leds, PANEL_LEDS);
+#else
     FastLED.addLeds<WS2812B, LED_PIN, GRB>(g_leds, PANEL_LEDS);
+#endif
     // Hard backstop on drive current. With one panel the limiter models the
     // load correctly, so a mistyped level cannot pull more than this.
     FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_MA);
     FastLED.setBrightness(255);       // levels are set per pixel, not globally
     FastLED.clear(true);
 
+#ifdef OE_PIN
+    // Buffer is black and on the wire; safe to open the shifters.
+    digitalWrite(OE_PIN, LOW);
+#endif
+
+#ifdef CTRL_OUTPUTS
+    Serial.printf(
+        "\n=== Baybasi panel liveness (via controller board) ==========\n"
+        "  D1/D2/D3 -> J1/J2/J3, same pattern on all three\n"
+        "  /OE on GPIO %d driven LOW: both 245s enabled\n"
+        "  Panel 5 V comes from the SUPPLY, not this board.\n"
+        "  Data is level-shifted to 5 V, so a failure here is REAL.\n"
+        "============================================================\n",
+        OE_PIN);
+#else
     Serial.printf(
         "\n=== Baybasi panel liveness =================================\n"
         "  %d LEDs on GPIO %d,  drive capped at %d mA\n"
@@ -176,6 +218,7 @@ void setup() {
         "         board before discarding - see the 3.3 V note in README.\n"
         "============================================================\n",
         PANEL_LEDS, LED_PIN, MAX_MA, MAX_MA + 340, MAX_MA);
+#endif
     Serial.printf("  %s\n", phaseName(g_phase));
     g_last = millis();
 }
