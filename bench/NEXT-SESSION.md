@@ -29,12 +29,20 @@ channel order (`CHANNEL_MAP = {2,0,1}`, measured).
 
 ## What to do next, in order
 
-1. **The DHCP gap in `fw/src/net.cpp`.** The highest-value item, and the only
-   one that blocks *every* board. There is deliberately no DHCP on the pixel
-   segment, so an unassigned board never gets an IP, never announces, and
-   cannot be commissioned - it only worked tonight because the home LAN has a
-   DHCP server. ~10 lines: give unassigned boards a deterministic address
-   derived from the MAC, e.g. `192.168.50.(128 + (mac[5] & 0x3F))`.
+1. ~~**The DHCP gap in `fw/src/net.cpp`.**~~ **DONE 2026-09-19.** A board with
+   no address of its own now waits `DHCP_WAIT_MS` (8 s) and then takes
+   `192.168.50.<MAC-derived>`. Proven on hardware against a laptop with no
+   DHCP server: the board took 192.168.50.125, announced every 2 s, and
+   `baybasi discover` listed it as unassigned.
+
+   Two things that were NOT in the original one-line plan:
+   - `linkUp()` was `g_link && ETH.linkUp()`, and `g_link` was only ever set
+     from `ARDUINO_EVENT_ETH_GOT_IP`. An address the board sets itself raises
+     no such event, so the fallback alone would have changed nothing. It now
+     reads `ETH.linkUp() && ETH.hasIP()`.
+   - The wait is ROLLING, not boot-time. The first version armed once at boot;
+     a board that got a lease and then lost it sat at 0.0.0.0 for ever and
+     needed a power cycle. That was caught on hardware, not in review.
 2. **Commission this board.** `baybasi assign ae:27:6e:a5:83:8d 0`. Retires the
    `bench/wall-bench.yaml` ddp_id hack. It reboots onto 192.168.50.11, so this
    also means moving to the pixel-segment addressing.

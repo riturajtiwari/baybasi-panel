@@ -9,9 +9,17 @@
 // cannot drift apart.
 //
 // Addressing follows the handoff: the Pi is .1 and controllers are .11 to .14,
-// static, held in NVS and set at commissioning.  A board with no assignment
-// takes DHCP, which on this network means link-local - enough to be seen and
-// commissioned, not enough to be mistaken for a working column.
+// static, held in NVS and set at commissioning.
+//
+// A board with no assignment asks for DHCP and, if nothing answers within
+// DHCP_WAIT_MS, gives itself a MAC-derived address on the pixel segment -
+// enough to be seen and commissioned, not enough to be mistaken for a working
+// column. This used to say DHCP "means link-local" on this network. It does
+// not: the ESP32 Ethernet driver has no IPv4 link-local autoconfiguration, so
+// a board with no DHCP server simply stayed at 0.0.0.0 and never announced.
+// The pixel segment has no DHCP server by design, so that was every board in
+// the field; it went unnoticed because the bench LAN has one. See the
+// addressing block in config.h.
 
 namespace net {
 

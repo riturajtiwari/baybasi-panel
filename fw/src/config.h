@@ -63,6 +63,46 @@ static constexpr uint32_t FADE_MS           = 600;
 static constexpr uint32_t ANNOUNCE_MS       = 2000;
 static constexpr uint32_t IDLE_REFRESH_MS   = 40;    // keep showing while idle
 
+// ---- addressing before a board is commissioned ----------------------------
+// There is deliberately NO DHCP server on the pixel segment. An unassigned
+// board therefore never gets an address from the network, and with no address
+// it cannot announce - which is the one thing an unassigned board exists to
+// do. It would sit there dark and undiscoverable, and the only reason this
+// was not caught during bring-up is that the bench runs on a home LAN that
+// does have DHCP.
+//
+// So: ask for DHCP first, because the bench LAN really does answer and it
+// costs one boot delay; then fall back to an address derived from the MAC.
+// The wait is a rolling one, not a boot-time one: any time the board has no
+// address for this long it takes one, so a lease lost or a segment changed
+// recovers by itself instead of stranding the board at 0.0.0.0.
+// Deterministic on purpose - the same board comes back at the same address
+// after a reboot, so an address written on a sticker stays true.
+//
+// The host byte lands in [MIN, MIN + SPAN), clear of the Pi at .1 and of the
+// commissioned columns at .11 - .14. Two boards CAN collide: 16 bits of MAC
+// into 176 slots is roughly a 3% chance across four boards. That is accepted
+// rather than solved, because commissioning is broadcast and names its target
+// MAC (see control.cpp) - colliding boards still announce, and each still
+// hears its own assign. The collision costs nothing before commissioning and
+// cannot survive it, since assignment replaces this with a static address.
+static constexpr uint8_t  FALLBACK_NET[4]    = {192, 168, 50, 0};
+static constexpr uint8_t  FALLBACK_MASK[4]   = {255, 255, 255, 0};
+static constexpr uint8_t  FALLBACK_GW[4]     = {192, 168, 50, 1};   // the Pi
+static constexpr uint8_t  FALLBACK_HOST_MIN  = 64;
+static constexpr uint16_t FALLBACK_HOST_SPAN = 176;                 // .64-.239
+static constexpr uint32_t DHCP_WAIT_MS       = 8000;
+
+// Pure so it can be tested on the host without an Ethernet stack. An
+// off-by-one here is not a small bug: it puts a board on .0 or .255 and that
+// board is both unreachable and a nuisance to everything else on the segment.
+// fw/test/test_netaddr.cpp checks every possible input.
+constexpr uint8_t fallbackHostByte(uint8_t mac4, uint8_t mac5) {
+    return (uint8_t)(FALLBACK_HOST_MIN
+                     + ((uint16_t)(((uint16_t)mac4 << 8) | mac5)
+                        % FALLBACK_HOST_SPAN));
+}
+
 // ---- colour ---------------------------------------------------------------
 // The Pi sends RGB, which is what the DDP data-type byte declares and what any
 // third-party DDP tool will assume. This maps each source channel into the

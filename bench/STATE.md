@@ -10,6 +10,8 @@ or a /tmp clean. Everything durable is in the `baybasi-fw-*` memories.
 - On the **home LAN by DHCP**, last seen **192.168.1.121**. This CHANGES across
   reboots - it was .180 earlier. Never hard-code it; find it with
   `baybasi discover` or by listening on udp/4049.
+- On a segment with **no DHCP server** it now takes **192.168.50.125**, derived
+  from its MAC and stable across reboots. Any board: the range is .64-.239.
 - Firmware: `fw/` built on platform **54.03.21-2** (Arduino 3.2.1 / IDF 5.4.2),
   FastLED S3/I2S, octal PSRAM. Verified 30 fps, shown==frames, colours correct.
 
@@ -25,6 +27,20 @@ or a /tmp clean. Everything durable is in the `baybasi-fw-*` memories.
   logSummary. Useful; strip before production.
 - Only **J1-J3** are reachable (devkit half-seated in A1L). D4-D12 need the
   breadboard jumpers or a jig-soldered devkit.
+
+## Discovery does not cross to Wi-Fi
+
+`baybasi discover` showed nothing all through the first session, with the
+board announcing correctly the whole time. The announce is a limited
+broadcast (255.255.255.255), and broadcast does not appear to reach wireless
+clients on this network - the UniFi gear filters it. Run the utility from a
+machine WIRED to the same segment. Not a problem for the wall, where the Pi is
+wired to the pixel segment, but it will waste an afternoon on the bench.
+
+Tested directly: laptop on the monitor's Ethernet port (`en3`, service name
+"Display Ethernet"), board straight into it, no DHCP server anywhere. A
+TP-Link USB-Ethernet adapter was tried first and never established a link -
+suspect that adapter, not the board.
 
 ## How to drive it
     pkill -f "baybasi.*pattern"        # ALWAYS - a stray sender ruins every test

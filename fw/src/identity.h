@@ -6,8 +6,9 @@
 //
 // It lives in NVS rather than in the image, so all four boards run one binary
 // and an OTA never touches the assignment.  A board with no assignment comes up
-// on DHCP (falling back to link-local), announces its factory MAC, and waits
-// for the Pi to tell it which column it is.
+// on DHCP - falling back to a MAC-derived address on the pixel segment, which
+// has no DHCP server - announces its factory MAC, and waits for the Pi to tell
+// it which column it is.  See net.h.
 //
 // The W5500's MAC is the chip's factory Ethernet MAC, so the identity the Pi
 // sees on the wire and the identity in the announcement cannot drift apart.
