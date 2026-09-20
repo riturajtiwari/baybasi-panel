@@ -38,6 +38,36 @@ _FONT: Dict[str, List[str]] = {
     "9": ["###", "# #", "###", "  #", "###"],
     "-": ["   ", "   ", "###", "   ", "   "],
     ".": ["   ", "   ", "   ", "   ", " # "],
+    # Uppercase, same 3x5 cell, added 2026-09-19 for the marquee. A/R and B/D
+    # and M/N are the pairs that collide in a 3-px cell if drawn carelessly;
+    # these are deliberately distinct.
+    " ": ["   ", "   ", "   ", "   ", "   "],
+    "A": [" # ", "# #", "###", "# #", "# #"],
+    "B": ["## ", "# #", "## ", "# #", "## "],
+    "C": ["###", "#  ", "#  ", "#  ", "###"],
+    "D": ["## ", "# #", "# #", "# #", "## "],
+    "E": ["###", "#  ", "###", "#  ", "###"],
+    "F": ["###", "#  ", "###", "#  ", "#  "],
+    "G": ["###", "#  ", "# #", "# #", "###"],
+    "H": ["# #", "# #", "###", "# #", "# #"],
+    "I": ["###", " # ", " # ", " # ", "###"],
+    "J": ["  #", "  #", "  #", "# #", "###"],
+    "K": ["# #", "# #", "## ", "# #", "# #"],
+    "L": ["#  ", "#  ", "#  ", "#  ", "###"],
+    "M": ["# #", "###", "###", "# #", "# #"],
+    "N": ["## ", "# #", "# #", "# #", "# #"],
+    "O": ["###", "# #", "# #", "# #", "###"],
+    "P": ["## ", "# #", "## ", "#  ", "#  "],
+    "Q": ["###", "# #", "# #", "###", "  #"],
+    "R": ["## ", "# #", "## ", "# #", "# #"],
+    "S": ["###", "#  ", "###", "  #", "###"],
+    "T": ["###", " # ", " # ", " # ", " # "],
+    "U": ["# #", "# #", "# #", "# #", "###"],
+    "V": ["# #", "# #", "# #", "# #", " # "],
+    "W": ["# #", "# #", "###", "###", "# #"],
+    "X": ["# #", "# #", " # ", "# #", "# #"],
+    "Y": ["# #", "# #", " # ", " # ", " # "],
+    "Z": ["###", "  #", " # ", "#  ", "###"],
 }
 
 
@@ -315,6 +345,143 @@ class Ident(Pattern):
         return f
 
 
+class Marquee(Pattern):
+    """Scrolling word per output, in that output's colour, over sparkles.
+
+    The showpiece. Every row of the wall is one marquee line running the full
+    64 px width, so on the finished wall a single word crosses all four
+    controller boards - which is the thing worth demonstrating, because it only
+    looks right if four independent boards are latching the same frame.
+
+    Colour is locked to the output number on the same 5/12 stride as ``ident``,
+    so adjacent outputs land 150 degrees apart rather than 30. Each output also
+    starts the word at a different offset, so J1, J2 and J3 differ in BOTH hue
+    and the letters on screen - you can tell them apart in a photograph taken
+    minutes apart, which a scrolling-hue pattern cannot promise (see the note
+    on ``flow`` above).
+
+    The sparkle layer is deterministic: per-pixel phase and rate are drawn once
+    from a seeded generator in __init__, never per frame, so ``frame(i)``
+    stays a pure function of i. That is the Pattern contract, and it is what
+    lets the wire test compare a sent frame against a received one byte for
+    byte.
+    """
+
+    name = "marquee"
+    period = 0                # replaced in __init__ with the real loop length
+
+    GLYPH_H, CELL = 5, 4      # 3 px glyph + 1 px gap
+    HUE_STRIDE = 5, 12
+    ROW_PHASE_PX = 13         # coprime with a 32 px strip: well spread rows
+    # Tuned for ONE 16x16 panel seen on its own, which is the bench reality
+    # and a harder case than the full wall: a 5 px word in a 16 px square
+    # leaves a lot of empty board, and sparse sparkles read as dead pixels
+    # rather than as a starfield. Denser and blunter than they would need to
+    # be across 64x192.
+    SPARKLE_FRACTION = 0.20   # ~51 of a panel's 256 pixels are stars
+    SPARKLE_CYCLES = (2, 3, 4)  # twinkles per loop; integers keep it seamless
+    SPARKLE_SHARPNESS = 3     # blunter = more of them lit at any one instant
+    SPARKLE_LEVEL = 0.65      # below the word: sparkle is the backing track
+
+    # A slow wash in the output's own hue under everything, so the empty board
+    # around the word carries the colour too and the panel never looks like a
+    # few lit dots on black.
+    WASH_MIN, WASH_AMP = 0.03, 0.11
+    WASH_CYCLES = 2           # per loop, so the wash is seamless as well
+
+    # No digital glow around the glyphs. A 1 px halo exactly fills the 1 px
+    # gap between two 3 px letters, and these panels already bloom hard enough
+    # at close range to wash a white core into a photograph. Drawn crisp, the
+    # LEDs supply the halo themselves.
+
+    def __init__(self, wall: Wall, *, text: str = "BAYBASI", speed: int = 1):
+        super().__init__(wall)
+        self.text = (text or "BAYBASI").upper()
+        # 1 px every 3 frames at speed 1 = 10 px/s. A whole glyph cell every
+        # 1.2 s: fast enough to look alive, slow enough to read through a
+        # 16 px window.
+        self.px_per_frame = max(1, int(speed)) / 3.0
+        # Trailing space so the word does not butt against its own repeat.
+        # "BAYBASI " is 8 cells = 32 px, which tiles the 64 px wall exactly.
+        self.strip = self._build_strip(self.text + " ")
+
+        # The text returns to its start after the strip has passed by once.
+        # Declaring it means a capture of exactly this many frames loops with
+        # no seam, and the driver knows the pattern is finite.
+        self.period = int(round(self.strip.shape[1] / self.px_per_frame))
+
+        rng = np.random.default_rng(0xBA4BA51)
+        shape = (wall.height, wall.width)
+        self._spark = rng.random(shape) < self.SPARKLE_FRACTION
+        self._phase = rng.random(shape).astype(np.float32)
+        # A WHOLE number of twinkles per loop, so the sparkle layer comes back
+        # into phase at the same moment the text does. A free-running rate
+        # would put a visible jump at the loop point of any capture.
+        # Kept as INTEGERS so the phase can be reduced with exact integer
+        # arithmetic below - i * cycles / period in floating point lands a
+        # hair off at the loop point and tips the odd pixel by one level.
+        self._cycles = rng.choice(np.asarray(self.SPARKLE_CYCLES),
+                                  size=shape).astype(np.int32)
+
+    def _build_strip(self, text: str) -> np.ndarray:
+        strip = np.zeros((self.GLYPH_H, self.CELL * len(text)), dtype=bool)
+        for n, ch in enumerate(text):
+            for dy, row in enumerate(_FONT.get(ch, _FONT[" "])):
+                for dx, lit in enumerate(row):
+                    if lit == "#":
+                        strip[dy, n * self.CELL + dx] = True
+        return strip
+
+    def frame(self, i: int) -> np.ndarray:
+        pw, ph = self.wall.panel_w, self.wall.panel_h
+        out = np.zeros((self.wall.height, self.wall.width, 3), dtype=np.float32)
+
+        # Sparkles first, white, whole wall. Raising a clipped sine to a power
+        # turns a slow swell into a brief flash.
+        turns = np.mod(i * self._cycles, self.period).astype(np.float32)
+        tw = np.sin(2.0 * np.pi * (turns / self.period + self._phase))
+        np.clip(tw, 0.0, 1.0, out=tw)
+        tw **= self.SPARKLE_SHARPNESS
+        tw *= self._spark
+        out += (tw * self.SPARKLE_LEVEL)[:, :, None]
+
+        stride, n = self.HUE_STRIDE
+        sw = self.strip.shape[1]
+        ty = (ph - self.GLYPH_H) // 2
+        shift = i * self.px_per_frame
+
+        # Diagonal wash, one array for the whole wall so neighbouring panels
+        # stay phase locked when there are twelve of them.
+        wy = np.arange(self.wall.height, dtype=np.float32)[:, None]
+        wx = np.arange(self.wall.width, dtype=np.float32)[None, :]
+        wash = self.WASH_MIN + self.WASH_AMP * (0.5 + 0.5 * np.sin(
+            wy * 0.40 + wx * 0.40
+            - 2.0 * np.pi * (i % self.period) * self.WASH_CYCLES / self.period))
+
+        for ctrl in self.wall.controllers:
+            x0 = ctrl.column * pw
+            for panel in ctrl.panels:
+                y0 = panel.row * ph
+                rgb = np.asarray(_hue((panel.output - 1) * stride, n),
+                                 dtype=np.float32) / 255.0
+
+                # ABSOLUTE x, not panel-local: that is what makes one word run
+                # across four boards instead of four boards each showing their
+                # own copy of it.
+                ax = np.arange(x0, x0 + pw, dtype=np.float32)
+                off = shift + panel.output * self.ROW_PHASE_PX
+                xs = np.mod(np.round(ax - off).astype(np.int64), sw)
+                mask = self.strip[:, xs]
+
+                band = out[y0 : y0 + ph, x0 : x0 + pw]
+                band += wash[y0 : y0 + ph, x0 : x0 + pw, None] * rgb
+                line = band[ty : ty + self.GLYPH_H]
+                line[mask] = rgb
+
+        np.clip(out, 0.0, 1.0, out=out)
+        return (out * 255.0).astype(np.uint8)
+
+
 class Gray(Pattern):
     """Vertical grey ramp.  Banding here means gamma or dither is wrong."""
 
@@ -352,6 +519,7 @@ BUILDERS: Dict[str, Callable[..., Pattern]] = {
     "bars": Bars,
     "flow": Flow,
     "ident": Ident,
+    "marquee": Marquee,
     "gray": Gray,
     "solid": Solid,
 }

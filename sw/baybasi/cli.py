@@ -141,17 +141,28 @@ def cmd_sink(args) -> int:
     return 0
 
 
+def _pattern_kw(args) -> dict:
+    """Per-pattern constructor arguments, shared by `pattern` and `render`."""
+    if getattr(args, "pattern", None) == "scroll":
+        return {"speed": args.speed}
+    if getattr(args, "pattern", None) == "solid":
+        return {"color": tuple(int(x) for x in args.color.split(","))}
+    if getattr(args, "pattern", None) == "marquee":
+        kw = {}
+        if getattr(args, "text", None):
+            kw["text"] = args.text
+        if getattr(args, "speed", None):
+            kw["speed"] = args.speed
+        return kw
+    return {}
+
+
 def cmd_pattern(args) -> int:
     from . import patterns
     from .pixels import Pipeline
     from .sender import DDPSender, WallClockPacer
     wall = _wall(args)
-    kw = {}
-    if args.pattern == "scroll":
-        kw = {"speed": args.speed}
-    if args.pattern == "solid":
-        kw = {"color": tuple(int(x) for x in args.color.split(","))}
-    pat = patterns.build(args.pattern, wall, **kw)
+    pat = patterns.build(args.pattern, wall, **_pattern_kw(args))
     pipe = Pipeline(wall)
     pacer = WallClockPacer(wall.render.fps, wall.render.epoch)
     print(f"sending '{args.pattern}' to {[c.ip for c in wall.controllers]} "
@@ -319,6 +330,80 @@ def cmd_status(args) -> int:
     return 0
 
 
+def _to_display(wire, gamma: float):
+    """LED drive values -> what a camera pointed at the panel would record.
+
+    `to_wire8` output is LINEAR light: the LUT is x**gamma, which is the
+    conversion from sRGB to the drive level a WS2812B needs so that the light
+    it emits looks like the sRGB value asked for. Writing those numbers into a
+    PNG hands linear light to a display that expects sRGB, and everything
+    comes out roughly twice as dark as the wall really is - a 65% sparkle
+    lands at 38% and reads as dull grey.
+
+    Encoding back to sRGB here is what makes the preview match the panel. It
+    is close to a round trip, which is the point: what survives it is the
+    dither and the 8-bit quantisation, which are exactly the artefacts a
+    preview should show.
+    """
+    import numpy as np
+    x = wire.astype(np.float32) / 255.0
+    return (np.power(x, 1.0 / max(gamma, 1e-6)) * 255.0).astype(np.uint8)
+
+
+def _dot_kernel(scale: int) -> "np.ndarray":
+    """A single LED's profile: a bright core with a soft bloom around it.
+
+    NEAREST upscaling draws each pixel as a hard square, which looks like a
+    spreadsheet. A real panel is discrete emitters on a dark board, and that
+    is what makes a capture read as "our wall" rather than "a screenshot".
+    """
+    import numpy as np
+    c = (scale - 1) / 2.0
+    yy, xx = np.mgrid[0:scale, 0:scale].astype(np.float32)
+    r = np.sqrt((yy - c) ** 2 + (xx - c) ** 2) / max(scale / 2.0, 1e-6)
+    core = np.clip((0.62 - r) / 0.18, 0.0, 1.0)      # solid centre, soft edge
+    bloom = 0.28 * np.exp(-((r / 0.62) ** 2))        # the glass diffuser
+    return np.clip(core + bloom, 0.0, 1.0).astype(np.float32)
+
+
+def _upscale(frame, scale: int, style: str):
+    """Wall frame -> display image, as hard squares or as lit emitters."""
+    import numpy as np
+    if style != "dots":
+        return np.kron(frame, np.ones((scale, scale, 1), dtype=np.uint8))
+    k = _dot_kernel(scale)
+    h, w = frame.shape[:2]
+    big = (frame[:, None, :, None, :].astype(np.float32)
+           * k[None, :, None, :, None])
+    return big.reshape(h * scale, w * scale, 3).astype(np.uint8)
+
+
+def _encode(images, path: str, fps: int) -> None:
+    """Pipe raw frames straight into ffmpeg. No intermediate PNGs."""
+    import subprocess
+    h, w = images[0].shape[:2]
+    # H.264 needs even dimensions; a scale that makes them odd is easy to hit.
+    if w % 2 or h % 2:
+        images = [im[: h - h % 2, : w - w % 2] for im in images]
+        h, w = images[0].shape[:2]
+    common = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo",
+              "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(fps), "-i", "-"]
+    if path.lower().endswith(".gif"):
+        # One palette pass over the whole clip, or saturated LEDs band badly.
+        tail = ["-filter_complex",
+                "[0:v] split [a][b];[a] palettegen=stats_mode=diff [p];"
+                "[b][p] paletteuse=dither=bayer:bayer_scale=3", path]
+    else:
+        tail = ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18",
+                "-movflags", "+faststart", path]
+    proc = subprocess.Popen(common + tail, stdin=subprocess.PIPE)
+    for im in images:
+        proc.stdin.write(im.tobytes())
+    proc.stdin.close()
+    if proc.wait() != 0:
+        raise SystemExit(f"ffmpeg failed writing {path}")
+
+
 def cmd_render(args) -> int:
     """Render frames to PNG without any network. The offline sanity check."""
     from PIL import Image
@@ -329,7 +414,7 @@ def cmd_render(args) -> int:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
     if args.pattern:
-        src = patterns.build(args.pattern, wall)
+        src = patterns.build(args.pattern, wall, **_pattern_kw(args))
         frames = [src.frame(i) for i in range(args.frames)]
     else:
         lib = _library(args, wall)
@@ -341,12 +426,34 @@ def cmd_render(args) -> int:
                 break
             slot, local = found
             frames.append(lib.cache.open_frames(slot.item.id, slot.item.fit)[local])
-    for i, f in enumerate(frames):
-        img = Image.fromarray(pipe.to_wire8(f), "RGB")
-        img = img.resize((wall.width * args.scale, wall.height * args.scale),
-                         Image.NEAREST)
-        img.save(out / f"frame_{i:05d}.png")
-    print(f"wrote {len(frames)} PNG(s) to {out}")
+    # Gamma, brightness and dither run over the WHOLE wall first - the
+    # pipeline is defined on a wall-sized frame, and bayer8 dithering depends
+    # on absolute pixel position, so cropping first would shift the dither
+    # lattice and give a panel that does not match the real one.
+    shown = [_to_display(pipe.to_wire8(f), wall.render.gamma) for f in frames]
+
+    if args.panel:
+        # One panel's view. With a single panel on the bench this is what you
+        # are actually looking at; the full wall is the thing you are building
+        # towards. Row and column are wall coordinates, so --panel 0,0 is the
+        # top-left panel, which on column 0's board is output D1 / J1.
+        pr, pc = (int(v) for v in args.panel.split(","))
+        y0, x0 = pr * wall.panel_h, pc * wall.panel_w
+        shown = [f[y0 : y0 + wall.panel_h, x0 : x0 + wall.panel_w]
+                 for f in shown]
+
+    images = [_upscale(f, args.scale, args.style) for f in shown]
+
+    if args.video:
+        _encode(images, args.video, args.fps or wall.render.fps)
+        h, w = images[0].shape[:2]
+        print(f"wrote {len(images)} frames to {args.video} ({w}x{h}, "
+              f"{args.fps or wall.render.fps} fps)")
+        return 0
+
+    for i, im in enumerate(images):
+        Image.fromarray(im, "RGB").save(out / f"frame_{i:05d}.png")
+    print(f"wrote {len(images)} PNG(s) to {out}")
     return 0
 
 
@@ -390,6 +497,7 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--frames", type=int, default=None)
     t.add_argument("--speed", type=int, default=1)
     t.add_argument("--color", default="255,255,255")
+    t.add_argument("--text", default=None, help="marquee: the word to scroll")
     t.add_argument("--brightness", type=float, default=None)
     t.add_argument("--fps", type=int, default=None)
     t.set_defaults(func=cmd_pattern)
@@ -450,8 +558,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     r = sub.add_parser("render", help="render frames to PNG, no network")
     r.add_argument("--pattern", choices=_pat.NAMES, default=None)
+    r.add_argument("--text", default=None, help="marquee: the word to scroll")
+    r.add_argument("--speed", type=int, default=1)
     r.add_argument("--frames", type=int, default=30)
     r.add_argument("--scale", type=int, default=4)
+    r.add_argument("--style", choices=("blocks", "dots"), default="blocks",
+                   help="dots draws each pixel as a lit emitter, like the panel")
+    r.add_argument("--video", default=None,
+                   help="encode straight to this .mp4/.gif instead of PNGs")
+    r.add_argument("--fps", type=int, default=None)
+    r.add_argument("--brightness", type=float, default=None)
+    r.add_argument("--panel", default=None, metavar="ROW,COL",
+                   help="crop to one panel, e.g. 0,0 for J1 on column 0")
     r.add_argument("--out-dir", default="render")
     r.set_defaults(func=cmd_render)
 

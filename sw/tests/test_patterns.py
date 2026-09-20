@@ -100,3 +100,81 @@ def test_flow_keeps_neighbouring_outputs_apart(wall):
                 f"frame {i}: J{a + 1} and J{b + 1} only "
                 f"{_sep(hues[a], hues[b]):.0f} degrees apart"
             )
+
+
+# ---- marquee --------------------------------------------------------------
+
+
+def test_marquee_is_a_pure_function_of_the_frame_index(wall):
+    """The sparkle layer must be seeded once in __init__, never drawn per
+    frame. Two calls for the same i have to be identical, or the wire test's
+    byte-for-byte comparison is meaningless and playback desynchronises the
+    two displays."""
+    p = patterns.build("marquee", wall)
+    assert np.array_equal(p.frame(17), p.frame(17))
+    q = patterns.build("marquee", wall)
+    assert np.array_equal(p.frame(17), q.frame(17)), "two instances disagree"
+
+
+def test_marquee_scrolls_left_to_right(wall):
+    p = patterns.build("marquee", wall)
+    row = 7  # inside J1's glyph band
+    a = p.frame(0)[row, :, :].max(axis=-1) > 200
+    for shift in range(1, 8):
+        b = p.frame(shift * 3)[row, :, :].max(axis=-1) > 200
+        if np.array_equal(b[shift:], a[:-shift]):
+            return
+    raise AssertionError("marquee did not move right by its scroll rate")
+
+
+def test_marquee_gives_adjacent_outputs_different_hues(wall):
+    p = patterns.build("marquee", wall)
+    f = p.frame(0)
+    hues = [_panel_hue(f, o) for o in range(1, 13)]
+    for o in range(11):
+        assert _sep(hues[o], hues[o + 1]) > 120.0, (
+            f"J{o + 1} and J{o + 2} only {_sep(hues[o], hues[o + 1]):.0f} apart"
+        )
+
+
+def test_marquee_offsets_each_row_so_the_letters_differ(wall):
+    """Hue alone is not enough: two panels the same colour showing the same
+    letters at the same moment would still be hard to tell apart in a photo."""
+    p = patterns.build("marquee", wall)
+    f = p.frame(0)
+    bands = [f[(o - 1) * 16 : o * 16, 0:16].max(axis=-1) > 200 for o in (1, 2, 3)]
+    for a, b in ((0, 1), (1, 2), (0, 2)):
+        assert not np.array_equal(bands[a], bands[b]), (
+            f"J{a + 1} and J{b + 1} show identical glyphs"
+        )
+
+
+def test_marquee_renders_the_requested_word(wall):
+    p = patterns.build("marquee", wall, text="hi")
+    assert p.strip.shape == (5, 12), "2 letters + trailing space, 4 px per cell"
+    # 'H' is the first glyph: outer columns full, middle column only the waist.
+    assert p.strip[:, 0].tolist() == [True] * 5
+    assert p.strip[:, 1].tolist() == [False, False, True, False, False]
+
+
+def test_marquee_never_leaves_a_panel_black(wall):
+    """A dark panel in a demo reads as a dead board."""
+    p = patterns.build("marquee", wall)
+    for i in (0, 25, 90):
+        f = p.frame(i)
+        for o in range(1, 13):
+            band = f[(o - 1) * 16 : o * 16, 0:16]
+            assert band.max() > 0, f"frame {i}, output {o} is fully black"
+
+
+def test_marquee_loops_seamlessly(wall):
+    """`period` is a promise: a capture of exactly that many frames has to
+    join back to its own start with no seam, sparkles included. The sparkle
+    phase is reduced with integer arithmetic for exactly this reason - the
+    float version left one pixel one level out at the join."""
+    p = patterns.build("marquee", wall)
+    assert p.period == 96, "BAYBASI at speed 1 is a 3.2 s loop at 30 fps"
+    for i in (0, 7, 41):
+        assert np.array_equal(p.frame(i), p.frame(i + p.period)), (
+            f"frame {i} differs from frame {i + p.period}"
+        )
