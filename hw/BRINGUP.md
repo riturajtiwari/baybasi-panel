@@ -241,6 +241,11 @@ Which buffer each output goes through, for fault isolation:
 the second buffer, its supply and its enable. With `ctrl-all12` there is nothing
 to rebuild; just move the panel to J7 and count seven white pixels.
 
+**PASSED 2026-09-20.** J4 -> 4 white pixels, J7 -> 7. U1 and U2 both good, A1L
+and A1R both good. Note what the count buys you: it separates "this output is
+dead" from "your jumpers are off by one", which is the failure this rig is most
+likely to produce and the one most easily mistaken for a bad chip.
+
 Verify the hole count before trusting it: A1R pin 1, 21 and 22 are all GND, so
 holes 1, 21 and 22 are dead shorts to J13 pin 2. If they are not, you are counting
 from the wrong end.

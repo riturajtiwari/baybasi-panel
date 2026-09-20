@@ -62,7 +62,10 @@ channel order (`CHANNEL_MAP = {2,0,1}`, measured).
 5. **Real media end to end.** `flow` proves synthetic frames; the actual use
    case is video and images through `baybasi add` / `driver`. That exercises
    decode, scaling and the playlist, none of which have touched hardware.
-6. **Outputs J4-J12.** Needs both devkit rows, so either the 14 breadboard
+6. ~~**Outputs J4-J12.**~~ U2 and A1R VALIDATED 2026-09-20 via the step-6
+   jumper rig (J4 -> 4 pixels, J7 -> 7). Nothing structural on the PCB is
+   unknown now. J8-J12 are individual traces, still untested, one screw
+   terminal each if wanted. Original note: Needs both devkit rows, so either the 14 breadboard
    jumpers (table in `hw/BRINGUP.md` step 6) or a devkit with headers soldered
    in the board as a jig.
 7. **Batch 2 PCB**: move A1L/A1R to 25.4 mm, and decide the co-routed

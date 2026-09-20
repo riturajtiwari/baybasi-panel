@@ -25,8 +25,13 @@ or a /tmp clean. Everything durable is in the `baybasi-fw-*` memories.
 - **Debug instrumentation is still in `fw/src/main.cpp`**: loop-iteration
   counter, `acquire()` null counter, and show() avg/max timing, all reported in
   logSummary. Useful; strip before production.
-- Only **J1-J3** are reachable (devkit half-seated in A1L). D4-D12 need the
-  breadboard jumpers or a jig-soldered devkit.
+- With the devkit half-seated in A1L, only **J1-J3** are reachable. D4-D12 need
+  the breadboard jumpers (hw/BRINGUP.md step 6) or a jig-soldered devkit.
+- **BOTH BUFFERS AND BOTH SOCKET HALVES ARE NOW PROVEN** (2026-09-20, step-6
+  jumper rig): D4 on J4 showed 4 white pixels and D7 on J7 showed 7. D4 was the
+  first signal ever through A1R; D7 is the first ever through U2, so it proves
+  that buffer, its supply and its enable. J8-J12 are individual traces on a
+  layout now shown correct in principle, and remain untested.
 
 ## Discovery does not cross to Wi-Fi
 
