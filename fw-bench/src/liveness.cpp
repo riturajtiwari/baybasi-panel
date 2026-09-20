@@ -9,7 +9,7 @@
 // Wiring, and the order matters:
 //
 //   devkit 14    -> panel DIN  (green)
-//   devkit 5Vin  -> panel +5 V (red)
+//   devkit 5Vin  -> panel +5 V (red)   <- and an external 5 V source here
 //   devkit GND   -> panel GND  (white)     <- connect FIRST, remove LAST
 //
 // Contiguous at the bottom of the left header, in the order DATA / 5V / GND.
@@ -70,13 +70,13 @@
 #define PANEL_LEDS 256
 #endif
 #ifndef MAX_MA
-#define MAX_MA 400          // FastLED drive budget, excludes quiescent
+#define MAX_MA 700          // FastLED drive budget, excludes quiescent
 #endif
 #ifndef SWEEP_LEVEL
 #define SWEEP_LEVEL 96      // only a few LEDs lit, so this can be bright
 #endif
 #ifndef FLOOD_LEVEL
-#define FLOOD_LEVEL 12      // ALL 256 lit: 256 * 20 mA * 12/255 = ~240 mA
+#define FLOOD_LEVEL 20      // ALL 256 lit: 256 * 20 mA * 12/255 = ~240 mA
 #endif
 #ifndef STATUS_LED
 #define STATUS_LED 48
