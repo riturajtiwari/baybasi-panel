@@ -38,6 +38,19 @@ uint32_t g_fadeStarted = 0;
 bool g_faded = false;
 uint32_t g_shown = 0;
 uint32_t g_tornAtLastCheck = 0;
+// Throughput instrumentation. Added 2026-09-19 to chase a stall - frames
+// assembled at 30 fps but only ~0.27/s reached the panel - and kept, because
+// it is the one place that says whether the wall is actually keeping up.
+//
+// Baseline measured that day, twelve outputs, 256 LEDs each, FastLED S3/I2S:
+// show() 5078 us avg against a 7680 us theoretical transfer, 15% duty at
+// 30 fps, shown == frames, torn == 0. A show() average that climbs toward
+// 33000 us, or shown falling behind frames, means the wall is dropping.
+//
+// All per-interval, reset at each log: a lifetime sum of microseconds would
+// overflow uint32 after about eight hours of running and then report nonsense.
+uint32_t g_showMaxUs = 0, g_showSumUs = 0, g_showN = 0;
+uint32_t g_loops = 0, g_loopsAtLog = 0, g_lastLogMs = 0, g_acqNull = 0;
 
 void logSummary() {
     const ddp::Stats &s = ddp::stats();
@@ -49,6 +62,19 @@ void logSummary() {
           (unsigned long)s.packets, (unsigned long)s.rejected,
           (unsigned long)s.malformed, (unsigned long)s.oversize,
           (unsigned long)ESP.getFreeHeap());
+    {
+        const uint32_t ms = millis() - g_lastLogMs;
+        log_i("loop: %lu iterations in %lu ms = %lu Hz   (acquire() null %lu x)",
+              (unsigned long)(g_loops - g_loopsAtLog), (unsigned long)ms,
+              (unsigned long)(ms ? (g_loops - g_loopsAtLog) * 1000UL / ms : 0),
+              (unsigned long)g_acqNull);
+        g_loopsAtLog = g_loops; g_lastLogMs = millis(); g_acqNull = 0;
+    }
+    log_i("show(): n=%lu  avg=%lu us  max=%lu us   (baseline 5078 us)",
+          (unsigned long)g_showN,
+          (unsigned long)(g_showN ? g_showSumUs / g_showN : 0),
+          (unsigned long)g_showMaxUs);
+    g_showN = 0; g_showSumUs = 0; g_showMaxUs = 0;
 }
 
 void updateStatus() {
@@ -98,6 +124,7 @@ void setup() {
 
 void loop() {
     const uint32_t now = millis();
+    g_loops++;
 
     status::tick();
     control::tick();
@@ -109,8 +136,15 @@ void loop() {
     if (control::otaRequested(url, sha)) ota::update(url, sha);
 
     // ---- a new complete frame -------------------------------------------
-    if (const uint8_t *frame = frames.acquire()) {
+    const uint8_t *frame = frames.acquire();
+    if (!frame) g_acqNull++;
+    if (frame) {
+        const uint32_t t_show = micros();
         leds::show(frame);
+        const uint32_t dt = micros() - t_show;
+        if (dt > g_showMaxUs) g_showMaxUs = dt;
+        g_showSumUs += dt;
+        g_showN++;
         g_shown++;
         g_lastShow = now;
         g_fadeStarted = 0;

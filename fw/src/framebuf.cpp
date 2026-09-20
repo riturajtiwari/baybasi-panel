@@ -50,18 +50,20 @@ void FrameAssembler::write(uint32_t offset, const uint8_t *data, uint32_t len) {
 
     uint8_t *dst = buf_[filling_];
 
-#if LED_ORDER_GRB
-    // Reorder while copying.  The absolute byte index gives the channel, so
+    // Reorder while copying. The absolute byte index gives the channel, so
     // this is exact for any offset and length, not only aligned ones.
+    //
+    // Unconditional: this used to sit behind #if LED_ORDER_GRB, which meant
+    // deleting that macro silently turned the reorder OFF and every colour
+    // wrong, with nothing to show for it in the build. CHANNEL_MAP is {0,1,2}
+    // if a pass-through is ever wanted, which costs the same and cannot fail
+    // quietly.
     for (uint32_t i = 0; i < len; i++) {
         const uint32_t abs = offset + i;
         const uint32_t px = abs / 3;
         const uint32_t ch = abs - px * 3;
         dst[px * 3 + CHANNEL_MAP[ch]] = data[i];
     }
-#else
-    memcpy(dst + offset, data, len);
-#endif
 
     if (!cov_.add(offset, offset + len))
         overruns_.fetch_add(1, std::memory_order_relaxed);

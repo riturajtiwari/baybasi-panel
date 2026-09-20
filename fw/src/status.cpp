@@ -1,4 +1,8 @@
 #include "status.h"
+// rgbLedWrite(), not neopixelWrite(). Identical signature, but arduino-esp32
+// 3.x deprecated the old name and warns on EVERY call - and this runs every
+// 40 ms, which buried the boot log under 400 warnings in 16 seconds the first
+// time this firmware ran. 2026-09-19.
 #include "config.h"
 
 namespace {
@@ -11,7 +15,7 @@ uint8_t g_phase = 0;
 namespace status {
 
 void begin() {
-    neopixelWrite(PIN_STATUS, 24, 0, 0);
+    rgbLedWrite(PIN_STATUS, 24, 0, 0);
     g_state = State::Booting;
 }
 
@@ -28,7 +32,7 @@ void tick() {
 
     if (now < g_identifyUntil) {
         const bool on = (g_phase / 3) & 1;
-        neopixelWrite(PIN_STATUS, on ? 120 : 0, on ? 120 : 0, on ? 120 : 0);
+        rgbLedWrite(PIN_STATUS, on ? 120 : 0, on ? 120 : 0, on ? 120 : 0);
         return;
     }
 
@@ -40,15 +44,15 @@ void tick() {
                                              : (uint8_t)(g_phase & 0x3f);
 
     switch (g_state) {
-        case State::Booting:   neopixelWrite(PIN_STATUS, 24, 0, 0); break;
-        case State::NoLink:    neopixelWrite(PIN_STATUS, slow ? 40 : 0, 0, 0); break;
-        case State::NoSignal:  neopixelWrite(PIN_STATUS, 30, 14, 0); break;
-        case State::Buffering: neopixelWrite(PIN_STATUS, 0, 0, 40); break;
-        case State::Running:   neopixelWrite(PIN_STATUS, 0, 3 + breathe / 8, 0); break;
-        case State::Torn:      neopixelWrite(PIN_STATUS, 30, 0, 30); break;
-        case State::Updating:  neopixelWrite(PIN_STATUS, breathe, breathe, breathe); break;
-        case State::Identify:  neopixelWrite(PIN_STATUS, 120, 120, 120); break;
-        case State::Fault:     neopixelWrite(PIN_STATUS, fast ? 90 : 0, 0, 0); break;
+        case State::Booting:   rgbLedWrite(PIN_STATUS, 24, 0, 0); break;
+        case State::NoLink:    rgbLedWrite(PIN_STATUS, slow ? 40 : 0, 0, 0); break;
+        case State::NoSignal:  rgbLedWrite(PIN_STATUS, 30, 14, 0); break;
+        case State::Buffering: rgbLedWrite(PIN_STATUS, 0, 0, 40); break;
+        case State::Running:   rgbLedWrite(PIN_STATUS, 0, 3 + breathe / 8, 0); break;
+        case State::Torn:      rgbLedWrite(PIN_STATUS, 30, 0, 30); break;
+        case State::Updating:  rgbLedWrite(PIN_STATUS, breathe, breathe, breathe); break;
+        case State::Identify:  rgbLedWrite(PIN_STATUS, 120, 120, 120); break;
+        case State::Fault:     rgbLedWrite(PIN_STATUS, fast ? 90 : 0, 0, 0); break;
     }
 }
 

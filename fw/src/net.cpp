@@ -52,10 +52,12 @@ bool begin() {
 
     // rst is passed as -1: the reset above has already happened and been
     // waited out, and letting the driver pulse it again would skip that wait.
+    // The SPIClass overload takes the bus, not the pins: SPI.begin() above has
+    // already bound SCK/MISO/MOSI. The 10-argument form that also takes pins
+    // wants a spi_host_device_t in that slot, not an SPIClass, so passing both
+    // an SPIClass and the pins matches no overload at all.
     const bool ok = ETH.begin(ETH_PHY_W5500, /*phy_addr=*/1, PIN_ETH_CS,
-                              PIN_ETH_INT, /*rst=*/-1, SPI,
-                              PIN_ETH_SCK, PIN_ETH_MISO, PIN_ETH_MOSI,
-                              ETH_SPI_MHZ);
+                              PIN_ETH_INT, /*rst=*/-1, SPI, ETH_SPI_MHZ);
     if (!ok) {
         log_e("ETH.begin failed: check the W5500 module, CS on GPIO%d and the "
               "50 ms reset delay", PIN_ETH_CS);
