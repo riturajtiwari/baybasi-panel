@@ -174,3 +174,62 @@ Upload `baybasi-ctrl-<date>-gerbers.zip` and take the defaults except where note
 | `make_cpl.py` | JLCPCB CPL from the board (pad centres, JLC rotations), cross-checked with the BOM |
 | `jlcpcb-bom.csv` | assembly BOM with LCSC numbers where known |
 | `drc-full.rpt` | last DRC including warnings |
+
+
+## Devkit header pitch - batch 1 vs batch 2 (2026-09-15)
+
+A1L/A1R are fitted at **22.86 mm (0.900 in)**. **CONFIRMED from Espressif's own
+dimension drawing**, DXF_ESP32-S3-DevKitC-1_V1.1_20220429.pdf: board width
+25.40 mm, 1.27 mm from each board edge to the pin-row centreline, so
+25.40 - 1.27 - 1.27 = **22.86 mm**.
+
+  https://dl.espressif.com/dl/schematics/esp_idf/DXF_ESP32-S3-DevKitC-1_V1.1_20220429.pdf
+
+Batch 1 (five boards) is correct for that part. **The design spacing was never
+wrong** - beware of sources claiming official DevKitC boards are 25.4 mm between
+rows; that is the board WIDTH, and both numbers appear on the same drawing.
+
+The third-party ESP32-S3 boards bought for the bench are at **25.4 mm** between
+rows - exactly one 2.54 mm pitch wider. **CONFIRMED 2026-09-15 by direct hole
+centre-to-centre measurement on a bare, unsoldered PCB**, which is the only
+measurement that settles this. Same pinout, pad for pad; only the pitch differs.
+They do not seat, and must not be forced.
+
+Do not re-open this by comparing board widths. 25.40 mm is the official board's
+WIDTH and 22.86 mm its row spacing; their difference is also 2.54 mm, so mixing
+the two yields "exactly one pitch" as an artefact and looks like confirmation.
+The third-party board is ~28 mm wide, not 25.4. **Measure hole centre to hole
+centre, on a bare board, or do not measure at all.**
+
+Decide before ordering batch 2, because it determines both:
+
+| | Devkit | A1L/A1R spacing | Batch 1 |
+|---|---|---|---|
+| **Standardise on Espressif** | official DevKitC-1, ~$16 | leave at 22.86 | works as built |
+| **Standardise on the clone** | what is already in hand | change to 25.4 in `gen_pcb.py` | needs an adapter |
+
+The spacing lives in one place, `gen_pcb.py`:
+
+    POS['A1R'] = (A1_PAD1[0] + 22.86, A1_PAD1[1], 0)
+
+`A1_BODY` and the silkscreen outline derive from `A1_PAD1`, so they follow.
+
+Whichever way it goes, **order two devkits and confirm one seats before buying
+the rest.** Not because the geometry is in doubt any more, but because a week
+and $32 is cheap against eight wrong boards.
+
+Orderable part: **ESP32-S3-DevKitC-1-N8R8**. DigiKey and Mouser stock it; so does
+Espressif's own Amazon storefront, ASIN B09MHP42LY:
+
+  https://www.amazon.com/stores/ESPRESSIFSYSTEMS/page/C3408769-6DB1-4CC2-A7B3-59C8EBAC8205
+
+**Buy through the Espressif storefront, not an Amazon search.** Marketplace
+listings titled "ESP32-S3-DevKitC-1" are overwhelmingly third-party boards with
+that pinout and a different row pitch - almost certainly where the 25.4 mm boards
+in hand came from. Row spacing is stated in no listing anywhere, so the brand and
+seller are the only signal.
+
+Any flash/PSRAM variant works: the firmware is ~300 KB and a double-buffered
+column of 3 072 pixels is ~18 KB. The **R8** part is what matters to keep
+identical - octal PSRAM reserves GPIO 35, 36, 37 internally, and this design
+already routes around all three.
