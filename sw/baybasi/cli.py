@@ -147,7 +147,7 @@ def _pattern_kw(args) -> dict:
         return {"speed": args.speed}
     if getattr(args, "pattern", None) == "solid":
         return {"color": tuple(int(x) for x in args.color.split(","))}
-    if getattr(args, "pattern", None) == "marquee":
+    if getattr(args, "pattern", None) in ("marquee", "badge"):
         kw = {}
         if getattr(args, "text", None):
             kw["text"] = args.text

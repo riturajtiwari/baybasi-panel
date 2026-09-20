@@ -482,6 +482,139 @@ class Marquee(Pattern):
         return (out * 255.0).astype(np.uint8)
 
 
+class Badge(Pattern):
+    """One complete, self-contained animation per panel. The bench demo.
+
+    Everything else here treats a panel as a 16x16 window onto a 64x192 wall,
+    which is right for the finished thing and wrong for a bench with one panel
+    on it: you get half a letter at each edge and no way to tell whether you
+    are looking at a finished picture or the middle of one.
+
+    This pattern never crosses a panel boundary. Each panel shows one big
+    letter of the word, centred, with a dot chasing round its own border and
+    its own sparkle field. Nothing is clipped, because nothing extends past
+    the edge.
+
+    Distinctness is on three axes at once, so two panels are never confusable:
+
+      colour   output number on the 5/12 hue stride (adjacent = 150 degrees)
+      letter   each output starts at a different point in the word, so at any
+               instant J1, J2 and J3 show three different letters
+      phase    the border chase starts at a different corner on each output
+
+    The glyphs are the 3x5 font at 2x - 6x10 in a 16x16 panel, which leaves a
+    margin wide enough for the border chase and the sparkles to read as
+    separate elements rather than crowding the letter.
+    """
+
+    name = "badge"
+    period = 0                # replaced in __init__
+
+    HUE_STRIDE = 5, 12
+    HOLD = 24                 # frames per letter, 0.8 s at 30 fps
+    FADE = 5                  # frames of dip between letters
+    ZOOM = 2                  # 3x5 font -> 6x10
+    LAPS = 4                  # border-chase laps per full word cycle
+    CHASE_LEN = 3
+    CHASE_STEP_OUT = 7        # border start offset per output
+    SPARKLE_FRACTION = 0.16
+    SPARKLE_CYCLES = (2, 3, 4)
+    SPARKLE_SHARPNESS = 3
+    SPARKLE_LEVEL = 0.55
+    WASH_MIN, WASH_AMP, WASH_CYCLES = 0.04, 0.10, 2
+
+    def __init__(self, wall: Wall, *, text: str = "BAYBASI", speed: int = 1):
+        super().__init__(wall)
+        self.text = (text or "BAYBASI").upper()
+        self.hold = max(2, int(round(self.HOLD / max(1, int(speed)))))
+        self.period = self.hold * len(self.text)
+
+        self.glyphs = [self._glyph(ch) for ch in self.text]
+        self.ring = self._ring(wall.panel_w, wall.panel_h)
+
+        rng = np.random.default_rng(0xBADBA5E)
+        shape = (wall.height, wall.width)
+        self._spark = rng.random(shape) < self.SPARKLE_FRACTION
+        self._phase = rng.random(shape).astype(np.float32)
+        self._cycles = rng.choice(np.asarray(self.SPARKLE_CYCLES),
+                                  size=shape).astype(np.int32)
+
+    def _glyph(self, ch: str) -> np.ndarray:
+        rows = _FONT.get(ch, _FONT[" "])
+        small = np.array([[c == "#" for c in row] for row in rows], dtype=bool)
+        return np.kron(small, np.ones((self.ZOOM, self.ZOOM), dtype=bool))
+
+    @staticmethod
+    def _ring(w: int, h: int) -> np.ndarray:
+        """Panel-local border coordinates, walked clockwise from (0, 0)."""
+        pts = ([(0, x) for x in range(w)]
+               + [(y, w - 1) for y in range(1, h)]
+               + [(h - 1, x) for x in range(w - 2, -1, -1)]
+               + [(y, 0) for y in range(h - 2, 0, -1)])
+        return np.asarray(pts, dtype=np.int32)
+
+    def frame(self, i: int) -> np.ndarray:
+        pw, ph = self.wall.panel_w, self.wall.panel_h
+        out = np.zeros((self.wall.height, self.wall.width, 3), dtype=np.float32)
+        i = i % self.period
+
+        tw = np.sin(2.0 * np.pi * (
+            np.mod(i * self._cycles, self.period).astype(np.float32)
+            / self.period + self._phase))
+        np.clip(tw, 0.0, 1.0, out=tw)
+        tw **= self.SPARKLE_SHARPNESS
+        tw *= self._spark
+        out += (tw * self.SPARKLE_LEVEL)[:, :, None]
+
+        wy = np.arange(self.wall.height, dtype=np.float32)[:, None]
+        wx = np.arange(self.wall.width, dtype=np.float32)[None, :]
+        wash = self.WASH_MIN + self.WASH_AMP * (0.5 + 0.5 * np.sin(
+            wy * 0.40 + wx * 0.40
+            - 2.0 * np.pi * i * self.WASH_CYCLES / self.period))
+
+        # Dip to black between letters so the change reads as a change and not
+        # as a glitch. Full brightness for the whole middle of the hold.
+        t = i % self.hold
+        alpha = float(np.clip(min(t, self.hold - t) / self.FADE, 0.0, 1.0))
+        slot = i // self.hold
+
+        nring = len(self.ring)
+        head = i * self.LAPS * nring / self.period
+
+        stride, n = self.HUE_STRIDE
+        for ctrl in self.wall.controllers:
+            x0 = ctrl.column * pw
+            for panel in ctrl.panels:
+                y0 = panel.row * ph
+                rgb = np.asarray(_hue((panel.output - 1) * stride, n),
+                                 dtype=np.float32) / 255.0
+                band = out[y0 : y0 + ph, x0 : x0 + pw]
+                band += wash[y0 : y0 + ph, x0 : x0 + pw, None] * rgb
+
+                g = self.glyphs[(slot + panel.output - 1) % len(self.glyphs)]
+                gh, gw = g.shape
+                gy, gx = (ph - gh) // 2, (pw - gw) // 2
+                cell = band[gy : gy + gh, gx : gx + gw]
+                # Composite, do NOT max with what is behind. A sparkle that
+                # lands on a glyph pixel and survives a max() turns that
+                # pixel white and the letter comes out moth-eaten. The letter
+                # is the subject; it is opaque, and only the fade makes it
+                # transparent.
+                cell[g] = cell[g] * (1.0 - alpha) + alpha * rgb
+
+                # Border chase, one panel's own edge. Bounded by construction:
+                # it cannot run off the panel the way a scrolling word does.
+                start = head + panel.output * self.CHASE_STEP_OUT
+                for k in range(self.CHASE_LEN):
+                    idx = int(start - k) % nring
+                    y, x = self.ring[idx]
+                    lvl = 1.0 - k / (self.CHASE_LEN + 1.0)
+                    band[y, x] = band[y, x] * (1.0 - lvl) + lvl * rgb
+
+        np.clip(out, 0.0, 1.0, out=out)
+        return (out * 255.0).astype(np.uint8)
+
+
 class Gray(Pattern):
     """Vertical grey ramp.  Banding here means gamma or dither is wrong."""
 
@@ -520,6 +653,7 @@ BUILDERS: Dict[str, Callable[..., Pattern]] = {
     "flow": Flow,
     "ident": Ident,
     "marquee": Marquee,
+    "badge": Badge,
     "gray": Gray,
     "solid": Solid,
 }

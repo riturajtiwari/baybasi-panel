@@ -178,3 +178,91 @@ def test_marquee_loops_seamlessly(wall):
         assert np.array_equal(p.frame(i), p.frame(i + p.period)), (
             f"frame {i} differs from frame {i + p.period}"
         )
+
+
+# ---- badge: the one pattern that must not cross a panel boundary ----------
+
+
+def _badge_cell(p, f, output):
+    """The glyph's rectangle inside one panel of column 0."""
+    g = p.glyphs[0]
+    gh, gw = g.shape
+    gy, gx = (16 - gh) // 2, (16 - gw) // 2
+    y0 = (output - 1) * 16
+    return f[y0 + gy : y0 + gy + gh, gx : gx + gw], (gy, gx, gh, gw)
+
+
+def test_badge_glyph_cannot_be_clipped_by_the_panel_edge(wall):
+    """The whole reason this pattern exists. Every other pattern treats a
+    panel as a window onto a bigger image, so a single panel on the bench
+    shows half a letter at each edge. Here the glyph has a margin on all four
+    sides, so nothing can run off."""
+    p = patterns.build("badge", wall)
+    for g in p.glyphs:
+        gh, gw = g.shape
+        gy, gx = (16 - gh) // 2, (16 - gw) // 2
+        assert gy >= 1 and gx >= 1, "glyph touches the panel edge"
+        assert gy + gh <= 15 and gx + gw <= 15, "glyph runs past the edge"
+
+
+def test_badge_draws_the_whole_letter_in_the_panel_hue(wall):
+    import colorsys
+    p = patterns.build("badge", wall)
+    i = p.hold // 2                       # mid-hold: alpha is 1
+    f = p.frame(i)
+    slot = i // p.hold
+    for output in (1, 2, 3):
+        cell, _ = _badge_cell(p, f, output)
+        want = p.glyphs[(slot + output - 1) % len(p.glyphs)]
+        lit_hue = colorsys.rgb_to_hsv(*(cell[want].mean(axis=0) / 255.0))[0] * 360
+        assert _sep(lit_hue, _panel_hue(f, output)) < 25.0
+        # every pixel of the glyph is actually lit
+        assert (cell[want].max(axis=-1) > 120).all(), f"J{output} letter has holes"
+
+
+def test_badge_shows_a_different_letter_on_each_output(wall):
+    p = patterns.build("badge", wall)
+    f = p.frame(p.hold // 2)
+    seen = []
+    for output in (1, 2, 3):
+        cell, _ = _badge_cell(p, f, output)
+        seen.append((cell.max(axis=-1) > 120).tobytes())
+    assert len(set(seen)) == 3, "two outputs are showing the same letter"
+
+
+def test_badge_walks_the_whole_word(wall):
+    """J1 must show B, A, Y, B, A, S, I in order.
+
+    The glyph has to be separated from the sparkles first: a sparkle is white,
+    a glyph pixel is J1's hue, which is pure red. Hashing the raw lit mask
+    instead counts the same letter twice as two different letters, because
+    the stars behind it moved.
+    """
+    p = patterns.build("badge", wall)
+    shapes = []
+    for slot in range(len(p.text)):
+        f = p.frame(slot * p.hold + p.hold // 2)
+        cell, _ = _badge_cell(p, f, 1)
+        red_only = ((cell[:, :, 0] > 120)
+                    & (cell[:, :, 1] < 60) & (cell[:, :, 2] < 60))
+        assert np.array_equal(red_only, p.glyphs[slot]), (
+            f"slot {slot} is not {p.text[slot]!r}"
+        )
+        shapes.append(red_only.tobytes())
+    assert len(set(shapes)) == len(set(p.text)), "distinct glyph count is wrong"
+
+
+def test_badge_loops_and_is_pure(wall):
+    p = patterns.build("badge", wall)
+    assert p.period == p.hold * len(p.text)
+    for i in (0, 13, 77):
+        assert np.array_equal(p.frame(i), p.frame(i + p.period))
+        assert np.array_equal(p.frame(i), p.frame(i))
+
+
+def test_badge_hues_are_far_apart_on_adjacent_outputs(wall):
+    p = patterns.build("badge", wall)
+    f = p.frame(p.hold // 2)
+    hues = [_panel_hue(f, o) for o in range(1, 13)]
+    for o in range(11):
+        assert _sep(hues[o], hues[o + 1]) > 120.0
