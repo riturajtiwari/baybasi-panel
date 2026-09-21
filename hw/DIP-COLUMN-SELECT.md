@@ -102,24 +102,43 @@ we want to support, and a reboot is the honest way to apply it).
 
 ## Part and JLCPCB assembly
 
-**Checked against the JLCPCB assembly parts library, 2026-09-20.** The earlier
-advice in this doc - "prefer an SMD 2-position DIP switch" - does not survive
-contact with what they actually stock.
+**Checked against the JLCPCB assembly parts library, 2026-09-20.** Two earlier
+recommendations in this doc were wrong and are corrected here.
 
-Searching "DIP Switch" returns 12 parts. **Exactly one has stock:**
+### Use C99418
 
 | | |
 |---|---|
-| Part | **C99987**, Diptronics **EI-04** |
-| Type | 4 position, **through-hole**, 2.54 mm pitch, SPST slide |
+| Part | **C99418**, DongGuan KINGTEK **DSWB04LHGET** |
+| Type | 4 position, through-hole, 2.54 mm pitch, SPST slide, red |
 | Rating | 24 V / 25 mA - fine for logic-level GPIO |
-| Stock | 103 |
-| Price | $0.52 at qty 1, $0.36 at 47+ |
+| Stock | **61,704** |
+| Price | **$0.2094** at qty 1 and at 40+ |
 | Class | Extended, so a one-time setup fee |
+| JLCPCB | https://jlcpcb.com/parts/componentSearch?searchTxt=DSWB04LHGET |
+| LCSC | https://www.lcsc.com/product-detail/C99418.html |
 
-Everything else in that search is stock 0 and marked **Consign Part**, meaning
-you buy and ship the parts yourself. That includes `CSWDIP-2P` (C9900014698),
-the 2-bit SMD part that would otherwise have been the obvious choice.
+### Two corrections, and a lesson about their search
+
+**"Prefer an SMD 2-position DIP switch" was wrong.** JLCPCB stocks no
+2-position DIP switch for assembly. `CSWDIP-2P` (C9900014698) exists in the
+library at stock 0, marked Consign Part - you buy and ship them yourself.
+
+**Then C99987 (Diptronics EI-04) was wrong too**, or at least much worse: 103
+in stock at $0.52, which had me writing warnings about thin stock. C99418 is
+the same 4-position THT 2.54 mm part at **a quarter the price and 600x the
+stock**, so the thin-stock caveat simply disappears.
+
+The lesson is about the tool, not the part. **JLCPCB's keyword search is
+unreliable**: searching "DIP Switch" returns 12 parts and does not include
+C99418 at all, despite it being a DIP switch with 61,704 in stock. Searching
+the manufacturer part number finds it immediately. Browse the category or
+search the MPN; do not trust a keyword search to be a survey of what they
+have.
+
+Alternatives found the same way, if C99418 ever goes: **C5145064**
+(DSWB04LHGETR, KE-SWITCH, 915 in stock, $0.22) and **C99987** (Diptronics
+EI-04, 103, $0.52). All the same 4 position THT 2.54 mm footprint.
 
 ### Use the 4-position part, and wire all four poles
 
@@ -136,11 +155,11 @@ Through-hole is not a problem - JLCPCB already places the sockets, terminal
 blocks, inductor and electrolytics on this board, so THT assembly is in the
 order regardless.
 
-**Stock of 103 is thin.** It covers ten boards comfortably but could be gone
-by order day. Check before finalising, and record the part number in
-FABRICATION.md next to the devkit's.
+Record the part number in FABRICATION.md next to the devkit's, and re-check
+stock before finalising - 61,704 is comfortable, but so was every part that
+later went obsolete.
 
-### If EI-04 is out of stock
+### If C99418 is out of stock
 
 **Pin header plus shunts.** Headers are stocked in enormous depth (C2333,
 2.54 mm 2x40P, 25,000+ in stock, $0.32) and snap to whatever length is needed.
