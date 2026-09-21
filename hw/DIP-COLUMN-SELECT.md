@@ -102,27 +102,54 @@ we want to support, and a reboot is the honest way to apply it).
 
 ## Part and JLCPCB assembly
 
-**Yes, JLCPCB can place it, and this board is already set up for it.**
-FABRICATION.md records that JLCPCB places all SMD parts *and* the through-hole
-sockets, terminal blocks, inductor and electrolytics — so both SMT and THT
-assembly are already in the order and neither has to be added.
+**Checked against the JLCPCB assembly parts library, 2026-09-20.** The earlier
+advice in this doc - "prefer an SMD 2-position DIP switch" - does not survive
+contact with what they actually stock.
 
-Prefer an **SMD 2-position DIP switch**: SMT assembly is already happening, it
-is cheaper per joint than THT, and there is no hand-soldering fee.
+Searching "DIP Switch" returns 12 parts. **Exactly one has stock:**
 
-Expect it to be an **Extended part**, not Basic, so budget a one-time setup fee
-(a few dollars) on the first order. Not per board.
+| | |
+|---|---|
+| Part | **C99987**, Diptronics **EI-04** |
+| Type | 4 position, **through-hole**, 2.54 mm pitch, SPST slide |
+| Rating | 24 V / 25 mA - fine for logic-level GPIO |
+| Stock | 103 |
+| Price | $0.52 at qty 1, $0.36 at 47+ |
+| Class | Extended, so a one-time setup fee |
 
-I cannot verify a specific LCSC part number from here — **search the JLCPCB
-parts library at order time** and pick one that is in stock, filtering for SMD,
-2 position, and a footprint that matches. Record the part number in
-FABRICATION.md alongside the devkit part number, for the same reason: a
-reorder that quietly ships a different footprint puts you back here.
+Everything else in that search is stock 0 and marked **Consign Part**, meaning
+you buy and ship the parts yourself. That includes `CSWDIP-2P` (C9900014698),
+the 2-bit SMD part that would otherwise have been the obvious choice.
 
-Alternative if no DIP switch is in stock at a sane price: a **1x3 pin header
-with shunts** (2 shunts, common centre pin to GND). JLCPCB stocks headers as Basic parts
-and already places THT. The tradeoff is loose shunts, which inside a sealed
-enclosure is a part you will eventually drop and lose. Prefer the DIP.
+### Use the 4-position part, and wire all four poles
+
+The EI-04 being 4-position is not a compromise - it is better than the
+2-position this doc specced. Use poles 1-2 for the column and **wire poles 3
+and 4 to the free GPIOs 17 and 18**. Two spare configuration bits, already
+placed, already routed, costing nothing. Leave them unread in firmware until
+there is something to read.
+
+That also empties the GPIO budget, which is the tradeoff: after this there are
+no free pins on this design. Worth it for switches that are placed anyway.
+
+Through-hole is not a problem - JLCPCB already places the sockets, terminal
+blocks, inductor and electrolytics on this board, so THT assembly is in the
+order regardless.
+
+**Stock of 103 is thin.** It covers ten boards comfortably but could be gone
+by order day. Check before finalising, and record the part number in
+FABRICATION.md next to the devkit's.
+
+### If EI-04 is out of stock
+
+**Pin header plus shunts.** Headers are stocked in enormous depth (C2333,
+2.54 mm 2x40P, 25,000+ in stock, $0.32) and snap to whatever length is needed.
+A 1x3 with the centre pin to GND takes two shunts. Cheaper and never
+unavailable; the cost is loose shunts, which inside a sealed enclosure is a
+part you will eventually drop and lose.
+
+**Or consign.** Buy 2-position SMD DIP switches from LCSC and ship them to
+JLCPCB. Most control, most hassle, and it puts a manual step in every reorder.
 
 ## Firmware
 
@@ -162,17 +189,19 @@ Rules that matter:
 
 ## gen_pcb.py
 
-- One 2-position DIP footprint, near the devkit socket and reachable with the
-  board mounted - it will be set with the board in hand, but read with it in
+- One **4-position** DIP footprint (Diptronics EI-04, THT 2.54 mm), near the
+  devkit socket and reachable with the board mounted - it will be set with the board in hand, but read with it in
   place.
-- Two traces to devkit pads for GPIO 9 and 16, plus GND.
-- Silkscreen: pole weights `2` and `1`, `COLUMN = 2+1`, and the ON direction.
+- Four traces to devkit pads for GPIO 9, 16, 17, 18, plus a common GND.
+  Poles 3 and 4 are spares - placed and routed now, unread until needed.
+- Silkscreen: poles 1 and 2 marked `1` and `2` by binary weight with
+  `COLUMN = 2+1`; poles 3 and 4 marked `SPARE`. Mark the ON direction.
 - Re-run the DRC/route pass; this is the first new footprint since revA.
 
 ## Honest cost
 
 The batch-2 change list was one line (`A1L/A1R` 22.86 -> 25.4 mm). This adds a
-footprint, two traces, silkscreen and a routing pass, plus firmware and a new
+footprint, four traces, silkscreen and a routing pass, plus firmware and a new
 part in the BOM. It is a real increase in respin scope and wants a careful DRC.
 
 Worth it on the grounds that the respin is happening anyway, the marginal
