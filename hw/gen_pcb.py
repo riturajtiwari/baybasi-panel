@@ -266,9 +266,15 @@ POS['A1L'] = (A1_PAD1[0], A1_PAD1[1], 0)
 POS['A1R'] = (A1_PAD1[0] + A1_PITCH, A1_PAD1[1], 0)
 A1_BODY = (A1_PAD1[0] - 1.25, A1_PAD1[1] - 0.85,
            A1_PAD1[0] + A1_PITCH + 1.25, A1_PAD1[1] + 62.55)
-# right: level shifters with their decoupling alongside
-col(69.0, 15.0, ['U1'], gap=2.5)
-col(69.0, 45.0, ['U2'], gap=2.5)
+# right: level shifters with their decoupling alongside.
+#
+# Shifted +2.5 mm for batch 2, together with the socket. A1R moved 2.54 mm
+# right when A1_PITCH went to 25.4, which squeezed the A1R-to-U1 channel from
+# about 7 mm to 4.5 mm; the router then could not keep the B.Cu pour continuous
+# through it and left isolated GND regions around x 60-78, y 24-34. Moving the
+# whole right-hand cluster by the same amount restores the channel.
+col(71.5, 15.0, ['U1'], gap=2.5)
+col(71.5, 45.0, ['U2'], gap=2.5)
 col(83.0, 17.0, ['C5'], gap=2.5)
 col(83.0, 47.0, ['C6'], gap=2.5)
 col(91.0, 30.0, ['R15'], gap=2.5)
@@ -395,7 +401,28 @@ texts = [(8.5, 4.4, 'RJ45 THIS EDGE', 1.0),
          (16.0, 93.0, 'J1-J12: SQ PAD = DATA', 0.9),
          (37.5, 73.5, 'ESP32-S3-DEVKITC-1', 0.9),         # inside the devkit outline,
          (37.5, 76.0, 'USB PORTS THIS END', 0.9),         # below the last socket pin
-         (3.0, 75.0, 'BAYBASI COLUMN CTRL revA', 1.2)]
+         # revB, and it MUST say so. revA is 22.86 mm between the socket
+         # rows and revB is 25.4 - two boards that look identical, take
+         # different devkits, and cannot be told apart on a shelf without a
+         # caliper.
+         #
+         # Split over two lines and shrunk: the single 1.2 mm line ran into
+         # SW1 at x 22.9, and moving it down to y 62 to dodge that put it
+         # through C1 (y 61.6-71.7) and C2 instead - 3 overlaps became 92.
+         # Free space here is narrow; check the placement box dump before
+         # moving any silkscreen text.
+         (3.0, 73.5, 'BAYBASI COLUMN CTRL', 0.9),
+         (3.0, 76.8, 'revB', 1.2),
+         # Switch legend. Weights sit left of their own pole (SW1 pads 1-4 at
+         # y 69.00/71.54/74.08/76.62, body starts at x 22.9). The sum goes
+         # below, kept short so it stops before R7 at x 27.5.
+         (20.8, 69.4, '1', 0.85), (20.8, 71.94, '2', 0.85),
+         (20.8, 74.48, 'SP', 0.85), (20.8, 77.02, 'SP', 0.85),
+         # Measured, not estimated: at size 0.8 this font runs ~0.74 mm per
+         # character, so the earlier 17-char version was 12.6 mm wide and
+         # reached R7's pads at x 28.3. 12 characters from x 16 ends at 24.9,
+         # clear of R7 by 2.6 mm.
+         (16.0, 82.5, 'COL=2+1 ON=1', 0.8)]
 # The per-connector refdes J1..J12 already print the panel number next to each
 # terminal, so no "PANELS 1-6 / 7-12" banners.
 for tx, ty, s_, sz in texts:

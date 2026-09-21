@@ -28,6 +28,13 @@ ROT_FIX = [
     (r'^SOT-223',            180),
     (r'^SOT-23',             180),
     (r'^DIP-',               270),   # JLC: pins horizontal, pin 1 bottom-left
+    # Same DIP-8 body as the sockets above, so the same convention SHOULD
+    # apply - but unlike every other entry here, this one was reasoned by
+    # analogy, not read off JLCPCB's overlay. CHECK IT IN THEIR PLACEMENT
+    # PREVIEW BEFORE CONFIRMING THE ORDER. A 180 error maps pads 1-4 onto 5-8,
+    # which wires COL_B0/B1/SP0/SP1 straight to GND and leaves the switch
+    # connecting GND to GND: not damaging, but dead, and confusing to debug.
+    (r'^SW_DIP_',            270),
     (r'^PinHeader_1x',       270),   # JLC: horizontal, pin 1 left
     (r'^TerminalBlock_',       0),   # KF350 / KF128: entry on +y at 0, like KiCad's
     (r'^CP_Radial_',           0),   # + on the left at 0, like KiCad's

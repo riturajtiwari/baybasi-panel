@@ -36,6 +36,9 @@
     )
   )
   (placement
+    (component Button_Switch_THT:SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm
+      (place SW1 124000 -119000 front 0 (PN SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm))
+    )
     (component Resistor_SMD:R_0805_2012Metric
       (place R15 192680 -80950 front 0 (PN R_0805_2012Metric))
       (place R1 129180 -62450 front 0 (PN R_0805_2012Metric))
@@ -67,15 +70,15 @@
     )
     (component Connector_PinHeader_2.54mm:PinHeader_1x22_P2.54mm_Vertical
       (place A1L 135570 -67000 front 0 (PN PinHeader_1x22_P2.54mm_Vertical))
-      (place A1R 158430 -67000 front 0 (PN PinHeader_1x22_P2.54mm_Vertical))
+      (place A1R 160970 -67000 front 0 (PN PinHeader_1x22_P2.54mm_Vertical))
     )
     (component Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
       (place M1 104770 -65000 front 0 (PN PinHeader_1x06_P2.54mm_Vertical))
       (place M2 125090 -65000 front 0 (PN PinHeader_1x06_P2.54mm_Vertical))
     )
     (component "Package_DIP:DIP-20_W7.62mm"
-      (place U1 170060 -66520 front 0 (PN "DIP-20_W7.62mm"))
-      (place U2 170060 -96520 front 0 (PN "DIP-20_W7.62mm"))
+      (place U1 172560 -66520 front 0 (PN "DIP-20_W7.62mm"))
+      (place U2 172560 -96520 front 0 (PN "DIP-20_W7.62mm"))
     )
     (component "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
       (place U3 118900 -89640 front 0 (PN "SOT-223-3_TabPin2"))
@@ -133,6 +136,52 @@
     )
   )
   (library
+    (image Button_Switch_THT:SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm
+      (outline (polygon signal 0  8945 -10285  -1325 -10285  -1325 2665  8945 2665))
+      (outline (path signal 120  -1380 2660  -1380 1277))
+      (outline (path signal 120  -1380 2660  3 2660))
+      (outline (path signal 120  -1140 2420  -1140 -10040))
+      (outline (path signal 120  -1140 2420  8760 2420))
+      (outline (path signal 120  -1140 -10040  8760 -10040))
+      (outline (path signal 120  3133.33 635  3133.33 -635))
+      (outline (path signal 120  3133.33 -1905  3133.33 -3175))
+      (outline (path signal 120  3133.33 -4445  3133.33 -5715))
+      (outline (path signal 120  3133.33 -6985  3133.33 -8255))
+      (outline (path signal 120  8760 2420  8760 -10040))
+      (outline (path signal 120  1780 635  3133.33 635  3133.33 -635  1780 -635  1780 635))
+      (outline (path signal 120  1780 635  5840 635  5840 -635  1780 -635  1780 635))
+      (outline (path signal 120  1780 -1905  3133.33 -1905  3133.33 -3175  1780 -3175  1780 -1905))
+      (outline (path signal 120  1780 -1905  5840 -1905  5840 -3175  1780 -3175  1780 -1905))
+      (outline (path signal 120  1780 -4445  3133.33 -4445  3133.33 -5715  1780 -5715  1780 -4445))
+      (outline (path signal 120  1780 -4445  5840 -4445  5840 -5715  1780 -5715  1780 -4445))
+      (outline (path signal 120  1780 -6985  3133.33 -6985  3133.33 -8255  1780 -8255  1780 -6985))
+      (outline (path signal 120  1780 -6985  5840 -6985  5840 -8255  1780 -8255  1780 -6985))
+      (outline (path signal 100  -1080 1360  -80 2360))
+      (outline (path signal 100  -1080 -9980  -1080 1360))
+      (outline (path signal 100  -80 2360  8700 2360))
+      (outline (path signal 100  3133.33 635  3133.33 -635))
+      (outline (path signal 100  3133.33 -1905  3133.33 -3175))
+      (outline (path signal 100  3133.33 -4445  3133.33 -5715))
+      (outline (path signal 100  3133.33 -6985  3133.33 -8255))
+      (outline (path signal 100  8700 2360  8700 -9980))
+      (outline (path signal 100  8700 -9980  -1080 -9980))
+      (outline (path signal 100  1780 635  3133.33 635  3133.33 -635  1780 -635  1780 635))
+      (outline (path signal 100  1780 635  5840 635  5840 -635  1780 -635  1780 635))
+      (outline (path signal 100  1780 -1905  3133.33 -1905  3133.33 -3175  1780 -3175  1780 -1905))
+      (outline (path signal 100  1780 -1905  5840 -1905  5840 -3175  1780 -3175  1780 -1905))
+      (outline (path signal 100  1780 -4445  3133.33 -4445  3133.33 -5715  1780 -5715  1780 -4445))
+      (outline (path signal 100  1780 -4445  5840 -4445  5840 -5715  1780 -5715  1780 -4445))
+      (outline (path signal 100  1780 -6985  3133.33 -6985  3133.33 -8255  1780 -8255  1780 -6985))
+      (outline (path signal 100  1780 -6985  5840 -6985  5840 -8255  1780 -8255  1780 -6985))
+      (pin RoundRect[A]Pad_1600.000000x1600.000000_250.951000_um_0.000000_0 1 0 0)
+      (pin Round[A]Pad_1600.000000_um 2 0 -2540)
+      (pin Round[A]Pad_1600.000000_um 3 0 -5080)
+      (pin Round[A]Pad_1600.000000_um 4 0 -7620)
+      (pin Round[A]Pad_1600.000000_um 5 7620 -7620)
+      (pin Round[A]Pad_1600.000000_um 6 7620 -5080)
+      (pin Round[A]Pad_1600.000000_um 7 7620 -2540)
+      (pin Round[A]Pad_1600.000000_um 8 7620 0)
+    )
     (image Resistor_SMD:R_0805_2012Metric
       (outline (polygon signal 0  1675 -945  -1675 -945  -1675 945  1675 945))
       (outline (path signal 120  -227.064 735  227.064 735))
@@ -1238,6 +1287,18 @@
     (net +5V
       (pins A1L-21 U1-1 U1-20 U2-1 U2-20 U3-3 L1-2 C1-1 C3-1 C5-1 C6-1 C8-1 C9-1)
     )
+    (net COL_B0
+      (pins SW1-1 A1L-15)
+    )
+    (net COL_B1
+      (pins SW1-2 A1L-9)
+    )
+    (net COL_SP0
+      (pins SW1-3 A1L-10)
+    )
+    (net COL_SP1
+      (pins SW1-4 A1L-11)
+    )
     (net D1_3V3
       (pins A1L-4 U1-2)
     )
@@ -1329,10 +1390,10 @@
       (pins A1L-18 M1-4)
     )
     (net GND
-      (pins A1L-22 A1R-1 A1R-21 A1R-22 M1-1 M1-2 M2-1 U1-8 U1-9 U1-10 U2-8 U2-9 U2-10
-        U3-1 C1-2 C2-2 C3-2 C4-2 J13-2 J14-2 R16-2 J1-2 R17-2 J2-2 R18-2 J3-2 R19-2
-        J4-2 R20-2 J5-2 R21-2 J6-2 R22-2 J7-2 R23-2 J8-2 R24-2 J9-2 R25-2 J10-2 R26-2
-        J11-2 R27-2 J12-2 C5-2 C6-2 C7-2 C8-2 C9-2 R13-2)
+      (pins SW1-5 SW1-6 SW1-7 SW1-8 A1L-22 A1R-1 A1R-21 A1R-22 M1-1 M1-2 M2-1 U1-8
+        U1-9 U1-10 U2-8 U2-9 U2-10 U3-1 C1-2 C2-2 C3-2 C4-2 J13-2 J14-2 R16-2 J1-2
+        R17-2 J2-2 R18-2 J3-2 R19-2 J4-2 R20-2 J5-2 R21-2 J6-2 R22-2 J7-2 R23-2 J8-2
+        R24-2 J9-2 R25-2 J10-2 R26-2 J11-2 R27-2 J12-2 C5-2 C6-2 C7-2 C8-2 C9-2 R13-2)
     )
     (net OE_N
       (pins R15-1 A1L-12 U1-19 U2-19)
@@ -1394,23 +1455,11 @@
     (net "unconnected-(A1L-Pin_3-Pad3)"
       (pins A1L-3)
     )
-    (net "unconnected-(A1L-Pin_9-Pad9)"
-      (pins A1L-9)
-    )
-    (net "unconnected-(A1L-Pin_10-Pad10)"
-      (pins A1L-10)
-    )
-    (net "unconnected-(A1L-Pin_11-Pad11)"
-      (pins A1L-11)
-    )
     (net "unconnected-(A1L-Pin_13-Pad13)"
       (pins A1L-13)
     )
     (net "unconnected-(A1L-Pin_14-Pad14)"
       (pins A1L-14)
-    )
-    (net "unconnected-(A1L-Pin_15-Pad15)"
-      (pins A1L-15)
     )
     (net "unconnected-(A1R-Pin_2-Pad2)"
       (pins A1R-2)
@@ -1457,19 +1506,18 @@
     (net "unconnected-(U2-B7-Pad11)"
       (pins U2-11)
     )
-    (class kicad_default +3V3E +5V D10_3V3 D10_5V D11_3V3 D11_5V D12_3V3 D12_5V
-      D1_3V3 D1_5V D2_3V3 D2_5V D3_3V3 D3_5V D4_3V3 D4_5V D5_3V3 D5_5V D6_3V3
-      D6_5V D7_3V3 D7_5V D8_3V3 D8_5V D9_3V3 D9_5V ETH_CS ETH_INT ETH_MISO
-      ETH_MOSI ETH_RST ETH_SCK GND OE_N OUT1 OUT10 OUT11 OUT12 OUT2 OUT3 OUT4
-      OUT5 OUT6 OUT7 OUT8 OUT9 SYNC_IN V5_PROT VGATE VIN_RAW "unconnected-(A1L-Pin_1-Pad1)"
-      "unconnected-(A1L-Pin_10-Pad10)" "unconnected-(A1L-Pin_11-Pad11)" "unconnected-(A1L-Pin_13-Pad13)"
-      "unconnected-(A1L-Pin_14-Pad14)" "unconnected-(A1L-Pin_15-Pad15)" "unconnected-(A1L-Pin_2-Pad2)"
-      "unconnected-(A1L-Pin_3-Pad3)" "unconnected-(A1L-Pin_9-Pad9)" "unconnected-(A1R-Pin_11-Pad11)"
-      "unconnected-(A1R-Pin_12-Pad12)" "unconnected-(A1R-Pin_13-Pad13)" "unconnected-(A1R-Pin_14-Pad14)"
-      "unconnected-(A1R-Pin_15-Pad15)" "unconnected-(A1R-Pin_16-Pad16)" "unconnected-(A1R-Pin_19-Pad19)"
-      "unconnected-(A1R-Pin_2-Pad2)" "unconnected-(A1R-Pin_20-Pad20)" "unconnected-(A1R-Pin_3-Pad3)"
-      "unconnected-(M2-Pin_4-Pad4)" "unconnected-(U1-B6-Pad12)" "unconnected-(U1-B7-Pad11)"
-      "unconnected-(U2-B6-Pad12)" "unconnected-(U2-B7-Pad11)"
+    (class kicad_default +3V3E +5V COL_B0 COL_B1 COL_SP0 COL_SP1 D10_3V3 D10_5V
+      D11_3V3 D11_5V D12_3V3 D12_5V D1_3V3 D1_5V D2_3V3 D2_5V D3_3V3 D3_5V
+      D4_3V3 D4_5V D5_3V3 D5_5V D6_3V3 D6_5V D7_3V3 D7_5V D8_3V3 D8_5V D9_3V3
+      D9_5V ETH_CS ETH_INT ETH_MISO ETH_MOSI ETH_RST ETH_SCK GND OE_N OUT1
+      OUT10 OUT11 OUT12 OUT2 OUT3 OUT4 OUT5 OUT6 OUT7 OUT8 OUT9 SYNC_IN V5_PROT
+      VGATE VIN_RAW "unconnected-(A1L-Pin_1-Pad1)" "unconnected-(A1L-Pin_13-Pad13)"
+      "unconnected-(A1L-Pin_14-Pad14)" "unconnected-(A1L-Pin_2-Pad2)" "unconnected-(A1L-Pin_3-Pad3)"
+      "unconnected-(A1R-Pin_11-Pad11)" "unconnected-(A1R-Pin_12-Pad12)" "unconnected-(A1R-Pin_13-Pad13)"
+      "unconnected-(A1R-Pin_14-Pad14)" "unconnected-(A1R-Pin_15-Pad15)" "unconnected-(A1R-Pin_16-Pad16)"
+      "unconnected-(A1R-Pin_19-Pad19)" "unconnected-(A1R-Pin_2-Pad2)" "unconnected-(A1R-Pin_20-Pad20)"
+      "unconnected-(A1R-Pin_3-Pad3)" "unconnected-(M2-Pin_4-Pad4)" "unconnected-(U1-B6-Pad12)"
+      "unconnected-(U1-B7-Pad11)" "unconnected-(U2-B6-Pad12)" "unconnected-(U2-B7-Pad11)"
       (circuit
         (use_via "Via[0-1]_600:300_um")
       )
@@ -1524,10 +1572,12 @@
     (via "Via[0-1]_600:300_um"  116500 -66500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -66500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -66500 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -66500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  193000 -66500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  116500 -75000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -75000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -75000 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -75000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  184500 -75000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  193000 -75000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  108000 -83500 (net GND)(type route))
@@ -1535,29 +1585,31 @@
     (via "Via[0-1]_600:300_um"  125000 -83500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -83500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -83500 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -83500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  184500 -83500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -92000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -92000 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -92000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  184500 -92000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  193000 -92000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -100500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -100500 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -100500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  193000 -100500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  125000 -109000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -109000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -109000 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -109000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  184500 -109000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  193000 -109000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  116500 -117500 (net GND)(type route))
-    (via "Via[0-1]_600:300_um"  125000 -117500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -117500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -117500 (net GND)(type route))
+    (via "Via[0-1]_600:300_um"  167500 -117500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  184500 -117500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  193000 -117500 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  108000 -126000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  116500 -126000 (net GND)(type route))
-    (via "Via[0-1]_600:300_um"  125000 -126000 (net GND)(type route))
-    (via "Via[0-1]_600:300_um"  133500 -126000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  142000 -126000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  150500 -126000 (net GND)(type route))
     (via "Via[0-1]_600:300_um"  159000 -126000 (net GND)(type route))

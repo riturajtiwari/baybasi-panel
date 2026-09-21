@@ -16,4 +16,5 @@ AO3401A,Q1,SOT-23,C15127,basic part; 1=G 2=S 3=D
 10k 1%,"R14,R15",0805,C17414,basic part - W5500 reset pull-up / 245 output-enable pull-up (3V3E)
 Terminal block 2P 3.50mm,"J1,J2,J3,J4,J5,J6,J7,J8,J9,J10,J11,J12",TB 1x02 P3.50,C474892,KF350-3.5-2P - wire entry faces the board edge (silk triangle side)
 Terminal block 2P 5.08mm,J13,TB 1x02 P5.08,C474952,KF128-5.08-2P-AA - wire entry faces the left edge
+DIP switch 4P 2.54mm,SW1,SW_DIP_SPSTx04 7.62mm,C99418,DSWB04LHGET - column select; poles 1-2 = column 0-3 binary, 3-4 spare
 Pin header 1x02 2.54mm,J14,1x02 header,,NOT POPULATED - optional sync input; fit by hand if ever needed
