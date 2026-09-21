@@ -105,6 +105,7 @@ REF_AT = {
 
 # ------------------------------------------------------------------ layout ---
 FP = {
+    'SW1': 'Button_Switch_THT:SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm',
     'R15': 'Resistor_SMD:R_0805_2012Metric',
     'A1L': 'Connector_PinHeader_2.54mm:PinHeader_1x22_P2.54mm_Vertical',
     'A1R': 'Connector_PinHeader_2.54mm:PinHeader_1x22_P2.54mm_Vertical',
@@ -239,21 +240,42 @@ for _n, (_hx, _hy) in enumerate(((1.2, 1.2), (BW - 7.6, 1.2),
     _x0, _y0, _x1, _y1 = RB[f'H{_n+1}']
     POS[f'H{_n+1}'] = (_hx - _x0, _hy - _y0, 0)
 
-# centre: the devkit sits on two 1x22 sockets 22.86 mm apart, pad 1 (3V3) at
-# the top, so its USB end points at the bottom edge. Body from Espressif's own
-# ESP32-S3-DevKitC courtyard: 0.85 mm above pad 1, 9.2 mm below pad 22 (the
-# USB shells and buttons live there), 1.25 mm outside each pin row.
+# centre: the devkit sits on two 1x22 sockets, pad 1 (3V3) at the top, so its
+# USB end points at the bottom edge. Body: 0.85 mm above pad 1, 9.2 mm below
+# pad 22 (the USB shells and buttons live there), 1.25 mm outside each pin row.
+#
+# A1_PITCH was 22.86 through batch 1, which is Espressif's own row spacing for
+# the DevKitC-1 (board width 25.40 less 1.27 from each edge to the pin-row
+# centreline, from their dimension drawing). It is correct for that part and
+# the design was never wrong.
+#
+# Batch 2 is 25.4 because every devkit actually in hand is a third-party board
+# at that spacing - exactly one 2.54 mm pitch wider - and none of them seat in
+# a 22.86 socket. Two independent confirmations: the fit test, which is binary
+# and cannot be misread, and a hole-centre-to-hole-centre measurement on a
+# bare board (2026-09-15).
+#
+# Do NOT "correct" this back by comparing board WIDTHS. 25.40 is the official
+# board's width and 22.86 its row spacing; their difference is also 2.54, so
+# mixing the two yields "exactly one pitch" as an artefact and reads like
+# confirmation. Measure hole centre to hole centre, on a bare board, or do not
+# measure at all. See hw/FABRICATION.md.
+A1_PITCH = 25.4
 A1_PAD1 = (35.57, 17.0)
 POS['A1L'] = (A1_PAD1[0], A1_PAD1[1], 0)
-POS['A1R'] = (A1_PAD1[0] + 22.86, A1_PAD1[1], 0)
+POS['A1R'] = (A1_PAD1[0] + A1_PITCH, A1_PAD1[1], 0)
 A1_BODY = (A1_PAD1[0] - 1.25, A1_PAD1[1] - 0.85,
-           A1_PAD1[0] + 24.11, A1_PAD1[1] + 62.55)
+           A1_PAD1[0] + A1_PITCH + 1.25, A1_PAD1[1] + 62.55)
 # right: level shifters with their decoupling alongside
 col(69.0, 15.0, ['U1'], gap=2.5)
 col(69.0, 45.0, ['U2'], gap=2.5)
 col(83.0, 17.0, ['C5'], gap=2.5)
 col(83.0, 47.0, ['C6'], gap=2.5)
 col(91.0, 30.0, ['R15'], gap=2.5)
+# column-select switch: below the devkit's LEFT row, the only clear pocket of
+# this size. Pads 1-4 face A1L, which is where COL_B0/B1/SP0/SP1 come from, so
+# the four traces are short and do not cross the board.
+POS['SW1'] = (24.0, 69.0, 0)
 
 boxes = {}
 for r in FP:

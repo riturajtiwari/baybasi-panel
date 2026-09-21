@@ -64,7 +64,13 @@ A1 = {21: '+5V', 22: 'GND', 23: 'GND', 24: 'GND', 44: 'GND',
       16: 'ETH_CS', 17: 'ETH_MOSI', 18: 'ETH_SCK', 19: 'ETH_MISO', 20: 'ETH_INT',
       4: 'D1_3V3', 5: 'D2_3V3', 6: 'D3_3V3', 7: 'SYNC_IN', 8: 'ETH_RST', 12: 'OE_N',
       41: 'D4_3V3', 40: 'D5_3V3', 27: 'D6_3V3', 35: 'D7_3V3', 36: 'D8_3V3',
-      37: 'D9_3V3', 38: 'D10_3V3', 39: 'D11_3V3', 28: 'D12_3V3'}
+      37: 'D9_3V3', 38: 'D10_3V3', 39: 'D11_3V3', 28: 'D12_3V3',
+      # Column select, batch 2. Devkit pads, not GPIO numbers:
+      #   pad 15 = GPIO 9, pad 9 = GPIO 16, pad 10 = GPIO 17, pad 11 = GPIO 18.
+      # All four were previously in A1L_NC. See hw/DIP-COLUMN-SELECT.md; the
+      # pad-to-GPIO reading is cross-checked against FABRICATION.md's pin map,
+      # which agrees on every pad the two have in common.
+      15: 'COL_B0', 9: 'COL_B1', 10: 'COL_SP0', 11: 'COL_SP1'}
 # The devkit sits on two 1x22 sockets, not one 44-pin part: JLCPCB places one
 # component per designator, and no 2x22 socket exists at 0.900 in spacing.
 # Left row is devkit pads 1..22 top-to-bottom; right row is 44..23.
@@ -77,6 +83,21 @@ part('A1L', 'Connector_Generic', 'Conn_01x22', 'ESP32-S3 socket L', HDR22,
      76.2, 152.4, {str(k): v for k, v in A1L_NETS.items()}, A1L_NC)
 part('A1R', 'Connector_Generic', 'Conn_01x22', 'ESP32-S3 socket R', HDR22,
      114.3, 152.4, {str(k): v for k, v in A1R_NETS.items()}, A1R_NC)
+
+# --- column select ---------------------------------------------------------
+# Four poles to GND, read with internal pull-ups, so closed = 0 on the pin and
+# the firmware inverts. Poles 1-2 are the column; 3-4 are spares, placed and
+# routed now because the part has them and traces are free.
+#
+#   pole 1: pad 1 <-> 8    COL_B0  (GPIO 9)
+#   pole 2: pad 2 <-> 7    COL_B1  (GPIO 16)
+#   pole 3: pad 3 <-> 6    COL_SP0 (GPIO 17)
+#   pole 4: pad 4 <-> 5    COL_SP1 (GPIO 18)
+part('SW1', 'Switch', 'SW_DIP_x04', 'DSWB04LHGET',
+     'Button_Switch_THT:SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm',
+     60.96, 200.0,
+     {'1': 'COL_B0', '2': 'COL_B1', '3': 'COL_SP0', '4': 'COL_SP1',
+      '5': 'GND', '6': 'GND', '7': 'GND', '8': 'GND'})
 
 # --- Ethernet module: WIZ850io, two 1x6 rows -------------------------------
 part('M1', 'Connector_Generic', 'Conn_01x06', 'WIZ850io J1',
