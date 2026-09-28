@@ -1,0 +1,450 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Baybasi Power Riser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{color-scheme:light dark;--paper:#F0EFEA; --sheet:#FBFAF7; --ink:#161A1F; --ink-2:#4E565F; --ink-3:#828A93;
+  --rule:#CECBC3; --rule-2:#E4E1DA; --pos:#BE3526; --neg:#495158; --fuse:#A0700B;
+  --data:#146F77; --accent:#BE3526; --loom-p:#EBD3CD; --loom-d:#CCE0E1;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0F1216; --sheet:#171B21; --ink:#E7E9ED; --ink-2:#A4ADB8; --ink-3:#6F7984;
+  --rule:#2B323B; --rule-2:#212831; --pos:#E9644F; --neg:#8E99A6; --fuse:#D6A02C;
+  --data:#3CB2B8; --accent:#E9644F; --loom-p:#3B2622; --loom-d:#163336;}}
+:root[data-theme="dark"]{--paper:#0F1216; --sheet:#171B21; --ink:#E7E9ED; --ink-2:#A4ADB8; --ink-3:#6F7984;
+  --rule:#2B323B; --rule-2:#212831; --pos:#E9644F; --neg:#8E99A6; --fuse:#D6A02C;
+  --data:#3CB2B8; --accent:#E9644F; --loom-p:#3B2622; --loom-d:#163336;}
+
+body{background:var(--paper);color:var(--ink);
+  font:400 17px/1.62 "Newsreader",Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased;padding:0 22px 120px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.col{max-width:63ch}
+h1,h2,h3,.lbl-h,.eyebrow,th,.tb,.keys li>b{font-family:"Archivo",system-ui,sans-serif}
+.mono,code,td.n,.spec{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+/* masthead ------------------------------------------------------------- */
+.mast{padding:64px 0 34px;border-bottom:2px solid var(--ink)}
+.eyebrow{margin:0 0 14px;font-size:11.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent)}
+h1{margin:0;font-size:clamp(34px,5.2vw,58px);font-weight:700;line-height:1.02;
+  letter-spacing:-.022em;text-wrap:balance}
+.lede{margin:20px 0 0;font-size:19px;color:var(--ink-2);max-width:56ch}
+.facts{display:flex;flex-wrap:wrap;gap:0;margin:34px 0 0;padding:0;
+  border-top:1px solid var(--rule)}
+.facts div{flex:1 1 170px;padding:16px 20px 14px;border-right:1px solid var(--rule)}
+.facts div:last-child{border-right:0}
+.facts dt{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+.facts dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:23px;
+  font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+
+/* sections ------------------------------------------------------------- */
+section{padding:56px 0 0}
+h2{margin:0 0 6px;font-size:27px;font-weight:600;letter-spacing:-.016em}
+h3{margin:34px 0 8px;font-size:16px;font-weight:600;letter-spacing:.01em}
+.sub{margin:0 0 26px;color:var(--ink-2);font-size:16.5px;max-width:60ch}
+p{margin:0 0 15px}
+a{color:var(--accent)}
+
+/* drawing sheets ------------------------------------------------------- */
+figure{margin:0;padding:0}
+.sheet-wrap{overflow-x:auto;border:1px solid var(--rule);background:var(--sheet)}
+.sheet-wrap svg{display:block;min-width:760px;width:100%;height:auto}
+.tb{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--rule);border-top:0;
+  font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.tb span{padding:9px 16px;border-right:1px solid var(--rule);color:var(--ink-2)}
+.tb span:first-child{color:var(--accent)}
+.tb span:last-child{border-right:0;margin-left:auto}
+
+/* key notes ------------------------------------------------------------ */
+.keys{counter-reset:k;list-style:none;margin:30px 0 0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px 34px}
+.keys li{counter-increment:k;position:relative;padding-left:36px;font-size:15.5px;
+  color:var(--ink-2)}
+.keys li::before{content:counter(k);position:absolute;left:0;top:1px;
+  width:23px;height:23px;border-radius:50%;background:var(--accent);color:var(--sheet);
+  font:600 12px/23px "IBM Plex Mono",monospace;text-align:center}
+.keys li b{display:block;color:var(--ink);font-weight:600;font-size:14px;
+  letter-spacing:.005em;margin-bottom:2px}
+
+/* tables --------------------------------------------------------------- */
+.tbl-wrap{overflow-x:auto;margin:22px 0 0}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14.5px}
+th{font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  text-align:left;color:var(--ink-3);padding:0 16px 8px 0;border-bottom:1px solid var(--ink)}
+td{padding:10px 16px 10px 0;border-bottom:1px solid var(--rule-2);vertical-align:top}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-size:13.5px;
+  padding-right:0;white-space:nowrap}
+th.n{text-align:right;padding-right:0}
+tr.total td{border-bottom:0;border-top:1px solid var(--ink);font-weight:600;
+  padding-top:12px}
+tr.total td.n{font-family:"IBM Plex Mono",monospace;font-size:16px}
+td.spec{font-size:12.5px;color:var(--ink-2)}
+tbody tr:hover{background:var(--rule-2)}
+
+/* notes ---------------------------------------------------------------- */
+.warn{margin:26px 0 0;padding:20px 24px;background:var(--sheet);
+  border-left:3px solid var(--accent);max-width:66ch}
+.warn p:last-child{margin-bottom:0}
+.warn .lbl-h{display:block;font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.warn code{font-size:13px;background:var(--rule-2);padding:2px 5px;border-radius:2px}
+
+ol.steps{margin:22px 0 0;padding-left:0;list-style:none;counter-reset:s;max-width:66ch}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 16px 44px;
+  border-bottom:1px solid var(--rule-2);margin-bottom:16px}
+ol.steps li:last-child{border-bottom:0}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:2px;
+  font:500 13px "IBM Plex Mono",monospace;color:var(--ink-3)}
+ol.steps b{font-family:"Archivo",sans-serif;font-size:14.5px;font-weight:600}
+
+ul.plain{margin:14px 0 0;padding-left:0;list-style:none;max-width:66ch}
+ul.plain li{position:relative;padding:0 0 10px 22px}
+ul.plain li::before{content:"";position:absolute;left:3px;top:11px;width:7px;height:1.5px;
+  background:var(--accent)}
+
+.rev{margin-top:64px;border-top:2px solid var(--ink);padding-top:20px;max-width:70ch}
+.rev h2{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.rev p{font-size:15px;color:var(--ink-2)}
+
+/* svg ------------------------------------------------------------------ */
+svg text{font-family:"IBM Plex Mono",ui-monospace,monospace;fill:var(--ink)}
+.sheet{fill:var(--sheet);stroke:var(--rule);stroke-width:1}
+.stile{fill:var(--rule-2)}
+.panel{fill:var(--sheet);stroke:var(--ink-3);stroke-width:1.1}
+.dots{fill:url(#dg);stroke:none}
+.box{fill:var(--sheet);stroke:var(--ink);stroke-width:1.4}
+.chip{fill:var(--rule-2);stroke:var(--ink-3);stroke-width:.8}
+.callout{fill:var(--rule-2);stroke:var(--rule);stroke-width:1}
+.loom{fill:var(--loom-p);stroke:var(--pos);stroke-width:.9}
+.loom-d{fill:var(--loom-d);stroke:var(--data)}
+.drop{stroke:var(--pos);stroke-width:2.2;fill:none}
+.drop-d{stroke:var(--data);stroke-width:1.8;fill:none}
+.hair{stroke:var(--ink-3);stroke-width:1;fill:none}
+.hair-d{stroke:var(--data);stroke-width:1;fill:none}
+.pp-pos{fill:var(--pos)}
+.pp-neg{fill:var(--neg)}
+.jstc{fill:var(--sheet);stroke:var(--data);stroke-width:1.2}
+.fuse{fill:var(--fuse);fill-opacity:.22;stroke:var(--fuse);stroke-width:1.3}
+.feed-pos{stroke:var(--pos);stroke-width:9;stroke-linecap:round}
+.feed3-pos{stroke:var(--pos);stroke-width:4;stroke-linecap:round}
+.feed3-neg{stroke:var(--neg);stroke-width:4;stroke-linecap:round}
+.feed-neg{stroke:var(--neg);stroke-width:9;stroke-linecap:round}
+.run-pos{stroke:var(--pos);stroke-width:4.5;fill:none;stroke-linecap:round}
+.run-neg{stroke:var(--neg);stroke-width:4.5;fill:none;stroke-linecap:round}
+.ferr{fill:var(--ink-3)}
+.mate{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:3 3}
+.ac{stroke:var(--ink-2);stroke-width:2;fill:none}
+.eth{stroke:var(--data);stroke-width:2;fill:none}
+.eth-t{fill:var(--data)}
+.ground{stroke:var(--ink);stroke-width:2}
+.hatch{stroke:var(--ink-3);stroke-width:1}
+.clip{fill:none;stroke:var(--ink-2);stroke-width:1.8}
+.dim-l{stroke:var(--ink-3);stroke-width:1;fill:none}
+.node{fill:var(--ink-2)}
+.nobond{stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+.xmark{stroke:var(--pos);stroke-width:2;fill:none}
+.rule-l{stroke:var(--rule);stroke-width:1}
+.key{fill:var(--accent)}
+.key-t{fill:var(--sheet);font-size:12px;font-weight:600}
+svg .lbl{font-size:12px;letter-spacing:.09em;font-weight:500}
+svg .sm{font-size:12px}
+svg .xs{font-size:11px}
+svg .dim{fill:var(--ink-2)}
+svg .pos{fill:var(--pos)}
+
+.encl{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-dasharray:8 5}
+.door{fill:var(--sheet);stroke:var(--ink);stroke-width:1.6}
+.hinge{fill:var(--ink-2)}
+.swing{stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:6 4;fill:none}
+
+@media (max-width:720px){
+  body{padding:0 16px 90px}
+  .facts div{flex:1 1 50%;border-bottom:1px solid var(--rule)}
+  .keys{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Baybasi pixel wall &#183; electrical</p>
+  <h1>Power riser<br>and cable plan</h1>
+  <p class="lede">Every column of twelve panels gets its own supply and its own unit &#8212;
+  fused block and controller board stacked in one enclosure. Four units ride on two hinged doors.
+  Columns share nothing but the network.</p>
+  <dl class="facts">
+    <div><dt>Supplies</dt><dd>8</dd></div>
+    <div><dt>Fused drops</dt><dd>96</dd></div>
+    <div><dt>DC cap per column</dt><dd>60 A</dd></div>
+    <div><dt>AC per display</dt><dd>12 A</dd></div>
+  </dl>
+</header>
+
+<section>
+  <h2>The per-column unit</h2>
+  <p class="sub">Block and board live in one box, one above the other. A single pair enters from
+  the supply. Twelve fused pairs, twelve data leads and one Cat5e come out. Four of these make a
+  display.</p>
+  <figure><div class="sheet-wrap"><svg viewBox="0 0 1060 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Per-column unit internal arrangement"><rect class="sheet" x="10" y="10" width="1040" height="580" rx="3"/><rect class="encl" x="150" y="62" width="760" height="470" rx="6"/><text class="lbl" x="150" y="48">PER-COLUMN UNIT &#183; ONE ENCLOSURE</text><rect class="box" x="230" y="100" width="634" height="190" rx="3"/><text class="lbl" x="246" y="126">12-WAY FUSED BLOCK</text><text class="xs dim" x="246" y="144">DaierTek 12-way &#183; 100 A &#183; 30 A/circuit</text><rect class="fuse" x="404" y="162" width="132" height="15" rx="2"/><rect class="fuse" x="404" y="186" width="132" height="15" rx="2"/><rect class="fuse" x="404" y="210" width="132" height="15" rx="2"/><rect class="fuse" x="404" y="234" width="132" height="15" rx="2"/><rect class="fuse" x="404" y="258" width="132" height="15" rx="2"/><rect class="fuse" x="576" y="162" width="132" height="15" rx="2"/><rect class="fuse" x="576" y="186" width="132" height="15" rx="2"/><rect class="fuse" x="576" y="210" width="132" height="15" rx="2"/><rect class="fuse" x="576" y="234" width="132" height="15" rx="2"/><rect class="fuse" x="576" y="258" width="132" height="15" rx="2"/><rect class="fuse" x="404" y="282" width="132" height="15" rx="2"/><rect class="fuse" x="576" y="282" width="132" height="15" rx="2"/><text class="xs dim" x="470" y="316" text-anchor="middle">12 &#215; 20 A ATC</text><circle class="node" cx="290" cy="205" r="9"/><circle cx="290" cy="205" r="15" fill="none" stroke="var(--pos)" stroke-width="2"/><text class="lbl pos" x="290" y="178" text-anchor="middle">+ M5 STUD</text><circle class="node" cx="806" cy="205" r="9"/><circle cx="806" cy="205" r="15" fill="none" stroke="var(--neg)" stroke-width="2"/><text class="lbl" x="806" y="178" text-anchor="middle">&#8722; M5 STUD</text><line class="feed-pos" x1="40" y1="205" x2="275" y2="205"/><line class="feed-neg" x1="1020" y1="205" x2="821" y2="205"/><text class="xs dim" x="40" y="186">FROM SUPPLY +</text><text class="xs dim" x="1020" y="186" text-anchor="end">FROM SUPPLY &#8722;</text><text class="xs" x="30" y="234">6 AWG welding</text><text class="xs dim" x="30" y="250">single pair</text><text class="xs dim" x="30" y="266">0.21 V at 60 A</text><path class="run-pos" d="M 275 205 H 192 V 372 H 230"/><rect class="fuse" x="183" y="304" width="18" height="26" rx="2"/><text class="xs" x="212" y="322">5 A inline &#8594; J13</text><text class="xs dim" x="212" y="338">the 13th circuit: the block has only 12</text><rect class="box" x="230" y="352" width="634" height="150" rx="3"/><text class="lbl" x="246" y="378">CONTROLLER PCB + DEVKIT</text><text class="xs dim" x="246" y="396">BAYBASI COLUMN CTRL revB &#183; 12 buffered outputs</text><rect class="chip" x="300" y="414" width="150" height="66" rx="2"/><text class="xs dim" x="312" y="438">ESP32-S3</text><text class="xs dim" x="312" y="456">DEVKITC-1</text><rect class="chip" x="470" y="414" width="96" height="66" rx="2"/><text class="xs dim" x="482" y="438">W5500</text><rect class="chip" x="586" y="414" width="54" height="66" rx="2"/><rect class="chip" x="652" y="414" width="54" height="66" rx="2"/><text class="xs dim" x="722" y="452">2 &#215; &#8217;AHCT245</text><path class="run-pos" d="M 864 244 H 888 V 566"/><path class="run-neg" d="M 864 262 H 878 V 566"/><text class="lbl" x="920" y="420">12 FUSED PAIRS</text><text class="xs dim" x="920" y="436">14 AWG &#8594; panels</text><path class="drop-d" d="M 560 502 V 566"/><path class="drop-d" d="M 578 502 V 566"/><path class="drop-d" d="M 596 502 V 566"/><text class="lbl" x="614" y="548">12 &#215; JST DATA</text><path class="eth" d="M 230 466 H 60"/><text class="xs eth-t" x="30" y="486">Cat5e &#8594; switch</text><text class="xs dim" x="150" y="578">Block above, board below. Nothing but the 5 V tap crosses between them inside the box.</text></svg></div><figcaption class="tb"><span>E-1</span><span>Per-column unit, internal arrangement</span><span>1 of 4 per display</span><span>NOT TO SCALE &#183; 2026-09-27</span></figcaption></figure>
+  <ol class="keys"><li><b>The three conductors converge at the supply, not at the unit</b>The supply&#8217;s three +V screws each carry a third of the load, because one M5 screw cannot carry sixty amps. Short 12 AWG pigtails leave those screws and are crimped into one 6 AWG lug within a foot. 3 &#215; 12 AWG is 9.9 mm&#178; into a 13.3 mm&#178; barrel, a 75 % fill. From there a single 6 AWG pair runs 4.5 ft to the unit and lands as one ring per stud.</li><li><b>The fuses stay upstream of the convergence</b>Each 12 AWG pigtail keeps its own 30 A inline fuse before the three meet. Merging the conductors does not merge their protection. <b>30 A, not 25 A:</b> each conductor carries about 20 A at the cap, blade fuses derate for continuous duty, and these are in parallel &#8212; blow one at 25 A and the other two jump to 30 A each and follow it, taking the column with them. At 30 A the working current is 67 % of rating and that cascade does not start. Make the pigtails 12 to 18 in: an ATC inline holder is three inches long, and six-inch pigtails come out more holder than wire.</li><li><b>The controller is the thirteenth circuit</b>The block has twelve positions and the column has twelve panels, so the board&#8217;s 5 V tap has nowhere to sit. It comes off the + stud through its own 5 A inline holder. Its return doubles onto a negative screw beside a panel return &#8212; not onto the negative stud, which is already at ABYC&#8217;s four-terminal limit with the three supply conductors on it.</li><li><b>Only the 5 V tap crosses between the halves</b>Panel current never touches the board. The board&#8217;s 0 V is the column&#8217;s signal reference and nothing else, which is why it is a tap off the same bus rather than a pass-through.</li><li><b>The convergence is a connector, not a splice</b>One <b>Anderson SB120-06-GRY</b> carries both poles, so a single mated pair per column detaches the whole unit for bench work. Genderless, colour-keyed so gray only mates gray, polarised so + cannot reach &#8722;, and 120 A rated against a 60 A cap. It costs 0.5 m&#8486; per mated pole &#8212; 0.06 V across the two &#8212; which is the price of a joint you can open. SB50 would not do: it is rated 50 A.</li></ol>
+
+  <h3>Mounting: four units, two doors</h3>
+  <p class="col">The four units for a display sit on two hinged doors in a 33 in bay on the side
+  of the frame, two units to a door, hinged at the outer edges so both swing out from the centre.
+  Everything that needs a meter or a fuse puller is reachable without going near the panels.</p>
+  <figure><div class="sheet-wrap"><svg viewBox="0 0 1060 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four units on two hinged doors"><rect class="sheet" x="10" y="10" width="1040" height="600" rx="3"/><path class="dim-l" d="M 112 76 H 948"/><line class="dim-l" x1="112" y1="68" x2="112" y2="84"/><line class="dim-l" x1="948" y1="68" x2="948" y2="84"/><text class="mono sm dim" x="530" y="66" text-anchor="middle">33 in</text><rect class="stile" x="96" y="96" width="18" height="400"/><rect class="stile" x="946" y="96" width="18" height="400"/><text class="lbl dim" x="105" y="516" text-anchor="middle">FRAME</text><text class="lbl dim" x="955" y="516" text-anchor="middle">FRAME</text><rect class="door" x="122" y="130" width="396" height="300" rx="3"/><rect class="door" x="542" y="130" width="396" height="300" rx="3"/><text class="lbl" x="320" y="154" text-anchor="middle">DOOR 1</text><text class="lbl" x="740" y="154" text-anchor="middle">DOOR 2</text><path class="dim-l" d="M 122 110 H 518"/><line class="dim-l" x1="122" y1="103" x2="122" y2="117"/><line class="dim-l" x1="518" y1="103" x2="518" y2="117"/><text class="mono sm dim" x="320" y="101" text-anchor="middle">16 in</text><path class="dim-l" d="M 542 110 H 938"/><line class="dim-l" x1="542" y1="103" x2="542" y2="117"/><line class="dim-l" x1="938" y1="103" x2="938" y2="117"/><text class="mono sm dim" x="740" y="101" text-anchor="middle">16 in</text><rect class="box" x="146" y="176" width="158" height="212" rx="3"/><text class="lbl" x="160" y="200">C1</text><rect class="chip" x="160" y="212" width="130" height="72" rx="2"/><text class="xs dim" x="168" y="238">FUSED</text><text class="xs dim" x="168" y="256">BLOCK</text><rect class="chip" x="160" y="296" width="130" height="66" rx="2"/><text class="xs dim" x="168" y="322">PCB +</text><text class="xs dim" x="168" y="340">DEVKIT</text><rect class="box" x="336" y="176" width="158" height="212" rx="3"/><text class="lbl" x="350" y="200">C2</text><rect class="chip" x="350" y="212" width="130" height="72" rx="2"/><text class="xs dim" x="358" y="238">FUSED</text><text class="xs dim" x="358" y="256">BLOCK</text><rect class="chip" x="350" y="296" width="130" height="66" rx="2"/><text class="xs dim" x="358" y="322">PCB +</text><text class="xs dim" x="358" y="340">DEVKIT</text><rect class="box" x="566" y="176" width="158" height="212" rx="3"/><text class="lbl" x="580" y="200">C3</text><rect class="chip" x="580" y="212" width="130" height="72" rx="2"/><text class="xs dim" x="588" y="238">FUSED</text><text class="xs dim" x="588" y="256">BLOCK</text><rect class="chip" x="580" y="296" width="130" height="66" rx="2"/><text class="xs dim" x="588" y="322">PCB +</text><text class="xs dim" x="588" y="340">DEVKIT</text><rect class="box" x="756" y="176" width="158" height="212" rx="3"/><text class="lbl" x="770" y="200">C4</text><rect class="chip" x="770" y="212" width="130" height="72" rx="2"/><text class="xs dim" x="778" y="238">FUSED</text><text class="xs dim" x="778" y="256">BLOCK</text><rect class="chip" x="770" y="296" width="130" height="66" rx="2"/><text class="xs dim" x="778" y="322">PCB +</text><text class="xs dim" x="778" y="340">DEVKIT</text><rect class="hinge" x="113" y="178" width="18" height="44" rx="2"/><rect class="hinge" x="113" y="338" width="18" height="44" rx="2"/><rect class="hinge" x="929" y="178" width="18" height="44" rx="2"/><rect class="hinge" x="929" y="338" width="18" height="44" rx="2"/><text class="lbl" x="60" y="200" text-anchor="middle">HINGE</text><path class="hair" d="M 60 210 V 240 H 112"/><text class="lbl" x="1000" y="200" text-anchor="middle">HINGE</text><path class="hair" d="M 1000 210 V 240 H 948"/><path class="swing" d="M 512 452 A 150 150 0 0 0 386 500"/><path class="swing" d="M 548 452 A 150 150 0 0 1 674 500"/><text class="xs dim" x="530" y="520" text-anchor="middle">doors swing out from the centre</text><rect class="callout" x="122" y="540" width="816" height="56" rx="3"/><text class="xs" x="138" y="562">Supplies are NOT on the doors. Four SMPS mount to the frame behind, each feeding one unit through a</text><text class="xs" x="138" y="580">service loop long enough that a door can open fully with the feed still connected.</text></svg></div><figcaption class="tb"><span>E-2</span><span>Four units on two hinged doors</span><span>1 of 2 displays</span><span>NOT TO SCALE &#183; 2026-09-27</span></figcaption></figure>
+  <div class="warn">
+    <span class="lbl-h">A hinged door is a moving cable bundle</span>
+    <p>Twelve drops, twelve data leads, one Cat5e and one supply feed all cross the hinge line on
+    every unit. Give each bundle a service loop sized for the door at full swing, dress it along
+    the hinge axis rather than across it, and clamp it on <b>both</b> sides of the hinge so the
+    flex happens in the loop and not at a terminal.</p>
+    <p>The feed is the one to watch: it is the stiffest bundle in the build and the only one
+    carrying fifty amps. If the door will not open with the feed connected, the feed is too short
+    &#8212; do not fix it by opening the door less.</p>
+  </div>
+  <h3>Still open</h3>
+  <ul class="plain">
+    <li><b>Bay height above the floor.</b> Mid-column is what halves the drop lengths, and the
+    door band sets it for all four columns at once. Fix this before cutting any 14 AWG.</li>
+    <li><b>Which side of the frame.</b> Whichever it is, the data loom has to cross the wall once
+    at the unit to reach the far stile. Decide the side and the crossing together.</li>
+    <li><b>Enclosure depth.</b> Measure the block with its cover latched, plus the ring terminal
+    stack on the studs, plus the devkit in its socket, before the box is made.</li>
+    <li><b>Whether the supplied device terminals take 14 AWG.</b> The block ships 24 of them for
+    the twelve circuits, but kits like this usually size them 16&#8211;22 AWG. If they will not
+    take the 14 AWG drops, buy rings that will &#8212; and rings rather than forks, because a fork
+    walks out from under a screw that backs off and a ring cannot.</li>
+    <li><b>The block&#8217;s bus material.</b> Amazon&#8217;s spec table says &#8220;Stainless
+    Steel&#8221;, which is almost certainly garbage referring to the screws &#8212; but stainless
+    has roughly forty times copper&#8217;s resistivity and this bus carries 60 A. Scratch the
+    plating and look for copper, or measure across the bus and expect milliohms.</li>
+    <li><b>Stud thread and usable length.</b> Reported as M5, #4&#8211;6 AWG, but not published
+    anywhere on the listing. The two supplied power terminals answer it on arrival: their hole size
+    is the stud size.</li>
+    <li><b>The blown-fuse LEDs at 5 V.</b> They are sized for 12 V and will pass about 3 mA here
+    instead of 10 mA. Check whether they are actually visible in room light before relying on them
+    to find a blown circuit.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>One column, floor to top</h2>
+  <p class="sub">Where the cable goes, not where the boxes sit. The block half and the PCB
+  half are drawn apart here for legibility &#8212; physically they share the one enclosure of E-1.
+  Twelve light pairs leave it, six up and six down, and peel out of the loom at the row they
+  serve.</p>
+  <figure><div class="sheet-wrap"><svg viewBox="0 0 1060 1400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Column power riser"><defs><pattern id="dg" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.35" fill="var(--rule)"/></pattern></defs><rect class="sheet" x="10" y="10" width="1040" height="1380" rx="3"/><rect class="stile" x="298" y="60" width="52" height="1198"/><rect class="stile" x="660" y="60" width="52" height="1198"/><text class="lbl dim" x="324" y="46" text-anchor="middle">DATA STILE</text><text class="lbl dim" x="686" y="46" text-anchor="middle">POWER STILE</text><rect class="panel" x="400" y="70" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="70" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="112">R01</text><rect class="panel" x="400" y="158" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="158" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="200">R02</text><rect class="panel" x="400" y="246" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="246" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="288">R03</text><rect class="panel" x="400" y="334" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="334" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="376">R04</text><rect class="panel" x="400" y="422" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="422" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="464">R05</text><rect class="panel" x="400" y="510" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="510" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="552">R06</text><rect class="panel" x="400" y="598" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="598" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="640">R07</text><rect class="panel" x="400" y="686" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="686" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="728">R08</text><rect class="panel" x="400" y="774" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="774" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="816">R09</text><rect class="panel" x="400" y="862" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="862" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="904">R10</text><rect class="panel" x="400" y="950" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="950" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="992">R11</text><rect class="panel" x="400" y="1038" width="210" height="76" rx="2"/><rect class="dots"  x="400" y="1038" width="210" height="76" rx="2"/><text class="mono sm" x="414" y="1080">R12</text><text class="lbl dim" x="505" y="46" text-anchor="middle">ONE COLUMN &#183; 12 PANELS</text><text class="xs dim" x="596" y="112" text-anchor="end">16&#215;16 &#183; 15.4 A</text><rect class="loom" x="674.5" y="460.0" width="23" height="56.0" rx="11.5"/><rect class="loom" x="676.5" y="372.0" width="19" height="88.0" rx="9.5"/><rect class="loom" x="678.5" y="284.0" width="15" height="88.0" rx="7.5"/><rect class="loom" x="680.5" y="196.0" width="11" height="88.0" rx="5.5"/><rect class="loom" x="682.5" y="108.0" width="7" height="88.0" rx="3.5"/><rect class="loom" x="674.5" y="668.0" width="23" height="56.0" rx="11.5"/><rect class="loom" x="676.5" y="724.0" width="19" height="88.0" rx="9.5"/><rect class="loom" x="678.5" y="812.0" width="15" height="88.0" rx="7.5"/><rect class="loom" x="680.5" y="900.0" width="11" height="88.0" rx="5.5"/><rect class="loom" x="682.5" y="988.0" width="7" height="88.0" rx="3.5"/><rect class="loom loom-d" x="312.5" y="460.0" width="23" height="56.0" rx="11.5"/><rect class="loom loom-d" x="314.5" y="372.0" width="19" height="88.0" rx="9.5"/><rect class="loom loom-d" x="316.5" y="284.0" width="15" height="88.0" rx="7.5"/><rect class="loom loom-d" x="318.5" y="196.0" width="11" height="88.0" rx="5.5"/><rect class="loom loom-d" x="320.5" y="108.0" width="7" height="88.0" rx="3.5"/><rect class="loom loom-d" x="312.5" y="668.0" width="23" height="56.0" rx="11.5"/><rect class="loom loom-d" x="314.5" y="724.0" width="19" height="88.0" rx="9.5"/><rect class="loom loom-d" x="316.5" y="812.0" width="15" height="88.0" rx="7.5"/><rect class="loom loom-d" x="318.5" y="900.0" width="11" height="88.0" rx="5.5"/><rect class="loom loom-d" x="320.5" y="988.0" width="7" height="88.0" rx="3.5"/><rect class="loom" x="674" y="516" width="24" height="152" rx="6"/><rect class="loom" x="698" y="530" width="32" height="124"/><rect class="loom loom-d" x="312" y="516" width="24" height="152" rx="6"/><rect class="loom loom-d" x="280" y="530" width="32" height="124"/><line class="drop" x1="680" y1="108.0" x2="652" y2="108.0"/><line class="drop-d" x1="330" y1="108.0" x2="358" y2="108.0"/><rect class="pp-pos" x="616"    y="97.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="108.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="97.0" x2="625" y2="119.0"/><rect class="jstc" x="358" y="100.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="100.0" x2="367" y2="116.0"/><line class="hair-d" x1="376" y1="100.0" x2="376" y2="116.0"/><line class="hair-d" x1="385" y1="100.0" x2="385" y2="116.0"/><line class="hair" x1="610" y1="108.0" x2="616" y2="108.0"/><line class="hair-d" x1="394" y1="108.0" x2="400" y2="108.0"/><line class="drop" x1="680" y1="196.0" x2="652" y2="196.0"/><line class="drop-d" x1="330" y1="196.0" x2="358" y2="196.0"/><rect class="pp-pos" x="616"    y="185.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="196.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="185.0" x2="625" y2="207.0"/><rect class="jstc" x="358" y="188.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="188.0" x2="367" y2="204.0"/><line class="hair-d" x1="376" y1="188.0" x2="376" y2="204.0"/><line class="hair-d" x1="385" y1="188.0" x2="385" y2="204.0"/><line class="hair" x1="610" y1="196.0" x2="616" y2="196.0"/><line class="hair-d" x1="394" y1="196.0" x2="400" y2="196.0"/><line class="drop" x1="680" y1="284.0" x2="652" y2="284.0"/><line class="drop-d" x1="330" y1="284.0" x2="358" y2="284.0"/><rect class="pp-pos" x="616"    y="273.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="284.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="273.0" x2="625" y2="295.0"/><rect class="jstc" x="358" y="276.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="276.0" x2="367" y2="292.0"/><line class="hair-d" x1="376" y1="276.0" x2="376" y2="292.0"/><line class="hair-d" x1="385" y1="276.0" x2="385" y2="292.0"/><line class="hair" x1="610" y1="284.0" x2="616" y2="284.0"/><line class="hair-d" x1="394" y1="284.0" x2="400" y2="284.0"/><line class="drop" x1="680" y1="372.0" x2="652" y2="372.0"/><line class="drop-d" x1="330" y1="372.0" x2="358" y2="372.0"/><rect class="pp-pos" x="616"    y="361.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="372.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="361.0" x2="625" y2="383.0"/><rect class="jstc" x="358" y="364.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="364.0" x2="367" y2="380.0"/><line class="hair-d" x1="376" y1="364.0" x2="376" y2="380.0"/><line class="hair-d" x1="385" y1="364.0" x2="385" y2="380.0"/><line class="hair" x1="610" y1="372.0" x2="616" y2="372.0"/><line class="hair-d" x1="394" y1="372.0" x2="400" y2="372.0"/><line class="drop" x1="680" y1="460.0" x2="652" y2="460.0"/><line class="drop-d" x1="330" y1="460.0" x2="358" y2="460.0"/><rect class="pp-pos" x="616"    y="449.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="460.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="449.0" x2="625" y2="471.0"/><rect class="jstc" x="358" y="452.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="452.0" x2="367" y2="468.0"/><line class="hair-d" x1="376" y1="452.0" x2="376" y2="468.0"/><line class="hair-d" x1="385" y1="452.0" x2="385" y2="468.0"/><line class="hair" x1="610" y1="460.0" x2="616" y2="460.0"/><line class="hair-d" x1="394" y1="460.0" x2="400" y2="460.0"/><line class="drop" x1="730" y1="548.0" x2="652" y2="548.0"/><line class="drop-d" x1="280" y1="548.0" x2="358" y2="548.0"/><rect class="pp-pos" x="616"    y="537.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="548.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="537.0" x2="625" y2="559.0"/><rect class="jstc" x="358" y="540.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="540.0" x2="367" y2="556.0"/><line class="hair-d" x1="376" y1="540.0" x2="376" y2="556.0"/><line class="hair-d" x1="385" y1="540.0" x2="385" y2="556.0"/><line class="hair" x1="610" y1="548.0" x2="616" y2="548.0"/><line class="hair-d" x1="394" y1="548.0" x2="400" y2="548.0"/><line class="drop" x1="730" y1="636.0" x2="652" y2="636.0"/><line class="drop-d" x1="280" y1="636.0" x2="358" y2="636.0"/><rect class="pp-pos" x="616"    y="625.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="636.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="625.0" x2="625" y2="647.0"/><rect class="jstc" x="358" y="628.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="628.0" x2="367" y2="644.0"/><line class="hair-d" x1="376" y1="628.0" x2="376" y2="644.0"/><line class="hair-d" x1="385" y1="628.0" x2="385" y2="644.0"/><line class="hair" x1="610" y1="636.0" x2="616" y2="636.0"/><line class="hair-d" x1="394" y1="636.0" x2="400" y2="636.0"/><line class="drop" x1="680" y1="724.0" x2="652" y2="724.0"/><line class="drop-d" x1="330" y1="724.0" x2="358" y2="724.0"/><rect class="pp-pos" x="616"    y="713.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="724.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="713.0" x2="625" y2="735.0"/><rect class="jstc" x="358" y="716.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="716.0" x2="367" y2="732.0"/><line class="hair-d" x1="376" y1="716.0" x2="376" y2="732.0"/><line class="hair-d" x1="385" y1="716.0" x2="385" y2="732.0"/><line class="hair" x1="610" y1="724.0" x2="616" y2="724.0"/><line class="hair-d" x1="394" y1="724.0" x2="400" y2="724.0"/><line class="drop" x1="680" y1="812.0" x2="652" y2="812.0"/><line class="drop-d" x1="330" y1="812.0" x2="358" y2="812.0"/><rect class="pp-pos" x="616"    y="801.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="812.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="801.0" x2="625" y2="823.0"/><rect class="jstc" x="358" y="804.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="804.0" x2="367" y2="820.0"/><line class="hair-d" x1="376" y1="804.0" x2="376" y2="820.0"/><line class="hair-d" x1="385" y1="804.0" x2="385" y2="820.0"/><line class="hair" x1="610" y1="812.0" x2="616" y2="812.0"/><line class="hair-d" x1="394" y1="812.0" x2="400" y2="812.0"/><line class="drop" x1="680" y1="900.0" x2="652" y2="900.0"/><line class="drop-d" x1="330" y1="900.0" x2="358" y2="900.0"/><rect class="pp-pos" x="616"    y="889.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="900.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="889.0" x2="625" y2="911.0"/><rect class="jstc" x="358" y="892.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="892.0" x2="367" y2="908.0"/><line class="hair-d" x1="376" y1="892.0" x2="376" y2="908.0"/><line class="hair-d" x1="385" y1="892.0" x2="385" y2="908.0"/><line class="hair" x1="610" y1="900.0" x2="616" y2="900.0"/><line class="hair-d" x1="394" y1="900.0" x2="400" y2="900.0"/><line class="drop" x1="680" y1="988.0" x2="652" y2="988.0"/><line class="drop-d" x1="330" y1="988.0" x2="358" y2="988.0"/><rect class="pp-pos" x="616"    y="977.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="988.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="977.0" x2="625" y2="999.0"/><rect class="jstc" x="358" y="980.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="980.0" x2="367" y2="996.0"/><line class="hair-d" x1="376" y1="980.0" x2="376" y2="996.0"/><line class="hair-d" x1="385" y1="980.0" x2="385" y2="996.0"/><line class="hair" x1="610" y1="988.0" x2="616" y2="988.0"/><line class="hair-d" x1="394" y1="988.0" x2="400" y2="988.0"/><line class="drop" x1="680" y1="1076.0" x2="652" y2="1076.0"/><line class="drop-d" x1="330" y1="1076.0" x2="358" y2="1076.0"/><rect class="pp-pos" x="616"    y="1065.0" width="36" height="11" rx="1.5"/><rect class="pp-neg" x="616"    y="1076.0"    width="36" height="11" rx="1.5"/><line class="hair"   x1="625" y1="1065.0" x2="625" y2="1087.0"/><rect class="jstc" x="358" y="1068.0" width="36" height="16" rx="2"/><line class="hair-d" x1="367" y1="1068.0" x2="367" y2="1084.0"/><line class="hair-d" x1="376" y1="1068.0" x2="376" y2="1084.0"/><line class="hair-d" x1="385" y1="1068.0" x2="385" y2="1084.0"/><line class="hair" x1="610" y1="1076.0" x2="616" y2="1076.0"/><line class="hair-d" x1="394" y1="1076.0" x2="400" y2="1076.0"/><rect class="box" x="730" y="500" width="210" height="184" rx="3"/><text class="lbl" x="744" y="524">UNIT &#183; BLOCK HALF</text><text class="xs dim" x="744" y="540">common bus &#183; 12 &#215; 20 A</text><rect class="fuse" x="746" y="550" width="74" height="13" rx="2"/><line class="hair" x1="756" y1="563" x2="756" y2="567"/><line class="hair" x1="810" y1="563" x2="810" y2="567"/><rect class="fuse" x="838" y="550" width="74" height="13" rx="2"/><line class="hair" x1="848" y1="563" x2="848" y2="567"/><line class="hair" x1="902" y1="563" x2="902" y2="567"/><rect class="fuse" x="746" y="570" width="74" height="13" rx="2"/><line class="hair" x1="756" y1="583" x2="756" y2="587"/><line class="hair" x1="810" y1="583" x2="810" y2="587"/><rect class="fuse" x="838" y="570" width="74" height="13" rx="2"/><line class="hair" x1="848" y1="583" x2="848" y2="587"/><line class="hair" x1="902" y1="583" x2="902" y2="587"/><rect class="fuse" x="746" y="590" width="74" height="13" rx="2"/><line class="hair" x1="756" y1="603" x2="756" y2="607"/><line class="hair" x1="810" y1="603" x2="810" y2="607"/><rect class="fuse" x="838" y="590" width="74" height="13" rx="2"/><line class="hair" x1="848" y1="603" x2="848" y2="607"/><line class="hair" x1="902" y1="603" x2="902" y2="607"/><rect class="fuse" x="746" y="610" width="74" height="13" rx="2"/><line class="hair" x1="756" y1="623" x2="756" y2="627"/><line class="hair" x1="810" y1="623" x2="810" y2="627"/><rect class="fuse" x="838" y="610" width="74" height="13" rx="2"/><line class="hair" x1="848" y1="623" x2="848" y2="627"/><line class="hair" x1="902" y1="623" x2="902" y2="627"/><rect class="fuse" x="746" y="630" width="74" height="13" rx="2"/><line class="hair" x1="756" y1="643" x2="756" y2="647"/><line class="hair" x1="810" y1="643" x2="810" y2="647"/><rect class="fuse" x="838" y="630" width="74" height="13" rx="2"/><line class="hair" x1="848" y1="643" x2="848" y2="647"/><line class="hair" x1="902" y1="643" x2="902" y2="647"/><rect class="fuse" x="746" y="650" width="74" height="13" rx="2"/><line class="hair" x1="756" y1="663" x2="756" y2="667"/><line class="hair" x1="810" y1="663" x2="810" y2="667"/><rect class="fuse" x="838" y="650" width="74" height="13" rx="2"/><line class="hair" x1="848" y1="663" x2="848" y2="667"/><line class="hair" x1="902" y1="663" x2="902" y2="667"/><text class="xs dim" x="744" y="676">+ 5 A tap &#8594; controller</text><rect class="box" x="70" y="500" width="210" height="184" rx="3"/><text class="lbl" x="84" y="524">UNIT &#183; PCB HALF</text><text class="xs dim" x="84" y="540">ESP32-S3 &#183; W5500 &#183; 12 out</text><rect class="chip" x="86" y="554" width="80" height="46" rx="2"/><rect class="chip" x="176" y="554" width="60" height="46" rx="2"/><text class="xs dim" x="84" y="654">5 V in on J13 &#183; fused 5 A</text><text class="xs dim" x="84" y="676">0 V common to this column</text><path class="eth" d="M 70 666 H 34 V 1100"/><text class="xs eth-t" x="34" y="1122">Cat5e &#8594; switch</text><rect class="box" x="730" y="1150" width="210" height="90" rx="3"/><text class="lbl" x="744" y="1174">5 V SUPPLY</text><text class="xs dim" x="744" y="1192">RSP-320-5 &#183; 5 V 60 A &#183; PFC</text><text class="xs dim" x="744" y="1210">ADJ trimmed at commissioning</text><line class="feed3-pos" x1="781" y1="1150" x2="781" y2="1084"/><line class="feed3-pos" x1="790" y1="1150" x2="790" y2="1084"/><line class="feed3-pos" x1="799" y1="1150" x2="799" y2="1084"/><line class="feed3-neg" x1="821" y1="1150" x2="821" y2="1084"/><line class="feed3-neg" x1="830" y1="1150" x2="830" y2="1084"/><line class="feed3-neg" x1="839" y1="1150" x2="839" y2="1084"/><rect class="fuse" x="776" y="1100" width="8" height="26" rx="1.5"/><rect class="fuse" x="785" y="1100" width="8" height="26" rx="1.5"/><rect class="fuse" x="794" y="1100" width="8" height="26" rx="1.5"/><circle class="node" cx="790" cy="1080" r="7"/><circle class="node" cx="830" cy="1080" r="7"/><line class="feed-pos" x1="790" y1="1074" x2="790" y2="684"/><line class="feed-neg" x1="830" y1="1074" x2="830" y2="684"/><text class="xs dim" x="856" y="1122">3 &#215; 30 A in the pigtails</text><text class="xs dim" x="856" y="1078">one 6 AWG lug each side</text><text class="lbl" x="856" y="900">6 AWG WELDING</text><text class="xs dim" x="856" y="916">60 A &#183; 4.5 ft &#183; 0.21 V</text><path class="ac" d="M 1010 1205 H 940"/><text class="xs dim" x="1010" y="1176" text-anchor="end">120 V AC</text><line class="ground" x1="200" y1="1258" x2="1012" y2="1258"/><line class="hatch" x1="204" y1="1258" x2="192" y2="1272"/><line class="hatch" x1="226" y1="1258" x2="214" y2="1272"/><line class="hatch" x1="248" y1="1258" x2="236" y2="1272"/><line class="hatch" x1="270" y1="1258" x2="258" y2="1272"/><line class="hatch" x1="292" y1="1258" x2="280" y2="1272"/><line class="hatch" x1="314" y1="1258" x2="302" y2="1272"/><line class="hatch" x1="336" y1="1258" x2="324" y2="1272"/><line class="hatch" x1="358" y1="1258" x2="346" y2="1272"/><line class="hatch" x1="380" y1="1258" x2="368" y2="1272"/><line class="hatch" x1="402" y1="1258" x2="390" y2="1272"/><line class="hatch" x1="424" y1="1258" x2="412" y2="1272"/><line class="hatch" x1="446" y1="1258" x2="434" y2="1272"/><line class="hatch" x1="468" y1="1258" x2="456" y2="1272"/><line class="hatch" x1="490" y1="1258" x2="478" y2="1272"/><line class="hatch" x1="512" y1="1258" x2="500" y2="1272"/><line class="hatch" x1="534" y1="1258" x2="522" y2="1272"/><line class="hatch" x1="556" y1="1258" x2="544" y2="1272"/><line class="hatch" x1="578" y1="1258" x2="566" y2="1272"/><line class="hatch" x1="600" y1="1258" x2="588" y2="1272"/><line class="hatch" x1="622" y1="1258" x2="610" y2="1272"/><line class="hatch" x1="644" y1="1258" x2="632" y2="1272"/><line class="hatch" x1="666" y1="1258" x2="654" y2="1272"/><line class="hatch" x1="688" y1="1258" x2="676" y2="1272"/><line class="hatch" x1="710" y1="1258" x2="698" y2="1272"/><line class="hatch" x1="732" y1="1258" x2="720" y2="1272"/><line class="hatch" x1="754" y1="1258" x2="742" y2="1272"/><line class="hatch" x1="776" y1="1258" x2="764" y2="1272"/><line class="hatch" x1="798" y1="1258" x2="786" y2="1272"/><line class="hatch" x1="820" y1="1258" x2="808" y2="1272"/><line class="hatch" x1="842" y1="1258" x2="830" y2="1272"/><line class="hatch" x1="864" y1="1258" x2="852" y2="1272"/><line class="hatch" x1="886" y1="1258" x2="874" y2="1272"/><line class="hatch" x1="908" y1="1258" x2="896" y2="1272"/><line class="hatch" x1="930" y1="1258" x2="918" y2="1272"/><line class="hatch" x1="952" y1="1258" x2="940" y2="1272"/><line class="hatch" x1="974" y1="1258" x2="962" y2="1272"/><line class="hatch" x1="996" y1="1258" x2="984" y2="1272"/><path class="clip" d="M 671 163 h 30 v 14 h -30"/><path class="clip" d="M 309 163 h 30 v 14 h -30"/><path class="clip" d="M 671 323 h 30 v 14 h -30"/><path class="clip" d="M 309 323 h 30 v 14 h -30"/><path class="clip" d="M 671 463 h 30 v 14 h -30"/><path class="clip" d="M 309 463 h 30 v 14 h -30"/><path class="clip" d="M 671 773 h 30 v 14 h -30"/><path class="clip" d="M 309 773 h 30 v 14 h -30"/><path class="clip" d="M 671 933 h 30 v 14 h -30"/><path class="clip" d="M 309 933 h 30 v 14 h -30"/><path class="clip" d="M 671 1093 h 30 v 14 h -30"/><path class="clip" d="M 309 1093 h 30 v 14 h -30"/><path class="dim-l" d="M 1012 70 V 1114"/><line class="dim-l" x1="1004" y1="70" x2="1020" y2="70"/><line class="dim-l" x1="1004" y1="1114" x2="1020" y2="1114"/><text class="mono sm dim" transform="translate(1005 592) rotate(-90)" text-anchor="middle">12 ROWS &#183; &#8776; 8 ft OVERALL</text><circle class="key" cx="730" cy="300" r="11"/><text class="key-t" x="730" y="304" text-anchor="middle">1</text><circle class="key" cx="960" cy="470" r="11"/><text class="key-t" x="960" y="474" text-anchor="middle">2</text><circle class="key" cx="44" cy="470" r="11"/><text class="key-t" x="44" y="474" text-anchor="middle">3</text><circle class="key" cx="736" cy="780" r="11"/><text class="key-t" x="736" y="784" text-anchor="middle">4</text><circle class="key" cx="736" cy="1085" r="11"/><text class="key-t" x="736" y="1089" text-anchor="middle">5</text><circle class="key" cx="634" cy="152" r="11"/><text class="key-t" x="634" y="156" text-anchor="middle">6</text></svg></div><figcaption class="tb"><span>E-3</span><span>Column power riser</span><span>1 of 4 columns</span><span>NOT TO SCALE &#183; 2026-09-13</span></figcaption></figure>
+  <ol class="keys"><li><b>The loom thins as it climbs</b>Five pairs leave the block in each direction. One pair peels off at every row, so the bundle that reaches row 1 carries a single drop. Size the split loom for the thick end.</li><li><b>Unit at mid height, not at the floor</b>No drop is then longer than half the wall. The 2 m leads already on order reach every row with slack, and the worst-case voltage drop halves. The door band sets this height for all four columns at once.</li><li><b>Split the two looms at the door, deliberately</b>Both now leave the same enclosure, so geometry no longer separates them for you. Power climbs one stile; data crosses at the unit and climbs the other. Twelve 5 V drops and twelve data leads in one loom is the mistake that is expensive to undo later.</li><li><b>Screw-mount P-clips, every 12 to 18 in</b>Not adhesive. 14 AWG silicone is heavy, the air at the top of the wall is warm, and adhesive clips let go. Take the weight of both looms at the top, not at the connectors.</li><li><b>A fuse on every feeder conductor</b>Three 12 AWG in parallel need three fuses. One protected conductor does nothing for its neighbours if one of them chafes through. 30 A inline at the supply, where the energy is.</li><li><b>Anderson PP30 at every panel</b>Crimp, genderless, keyed by housing colour. A dead panel comes out in ten seconds with no soldering iron at the top of a ladder. That is the whole point of the connector.</li></ol>
+</section>
+
+<section class="col">
+  <h2>The load, honestly</h2>
+  <p>A 16&#215;16 panel at full white is 256 LEDs at 60 mA, so <b>15.4 A</b>. Twelve of them is
+  <b>184 A</b> a column and <b>737 A</b> a display. Nobody builds 737 A of 5 V distribution, and
+  nothing you would ever show needs it.</p>
+  <p>So the firmware caps each column at <b>60 A</b> and scales the whole frame down to fit. That
+  is a third of full white, which for real content is generous: a frame has to be almost entirely
+  white before the cap even engages. The supply is sized to the cap, not to the arithmetic.</p>
+  <div class="warn">
+    <span class="lbl-h">This sheet depends on one line of firmware</span>
+    <p>The 60 A budget is enforced in software, not in hardware. <code>FastLED.setMaxPowerInVoltsAndMilliamps(5, 60000)</code>
+    is in the bench firmware. It is <b>not yet in the production handoff</b>. Without it, a white
+    frame asks a 60 A supply for 184 A, and what happens next depends on which supply you bought.
+    Add it before a column is ever fed from its own supply.</p>
+  </div>
+</section>
+
+<section>
+  <h2>One display, one line</h2>
+  <p class="sub">Four identical circuits, mains to pixels, with the data path underneath. The
+  only thing crossing between columns is Ethernet.</p>
+  <figure><div class="sheet-wrap"><svg viewBox="0 0 1060 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Display one-line diagram"><defs><pattern id="dg" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.35" fill="var(--rule)"/></pattern></defs><rect class="sheet" x="10" y="10" width="1040" height="740" rx="3"/><rect class="box" x="34" y="46" width="176" height="52" rx="3"/><text class="lbl" x="46" y="68">120 V AC</text><text class="xs dim" x="46" y="86">dedicated 20 A circuit</text><path class="ac" d="M 120 98 V 452"/><path class="ac" d="M 120 140 H 214"/><circle class="node" cx="120" cy="140" r="3.5"/><rect class="box" x="214" y="112" width="160" height="56" rx="3"/><text class="lbl" x="226" y="132">RSP-320-5</text><text class="xs dim" x="226" y="149">5 V 60 A &#183; PFC</text><line class="feed-pos" x1="374" y1="133" x2="474" y2="133"/><line class="feed-neg" x1="374" y1="147" x2="474" y2="147"/><rect class="fuse" x="404" y="124" width="40" height="18" rx="2"/><text class="xs" x="424" y="114" text-anchor="middle">3 &#215; 30 A</text><text class="xs dim" x="424" y="174" text-anchor="middle">6 AWG single pair</text><rect class="box" x="474" y="112" width="166" height="56" rx="3"/><text class="lbl" x="486" y="132">12-WAY BLOCK</text><text class="xs dim" x="486" y="149">12&#215;20 A + 1&#215;5 A</text><line class="drop" x1="640" y1="118" x2="734" y2="118"/><line class="drop" x1="640" y1="122" x2="734" y2="122"/><line class="drop" x1="640" y1="126" x2="734" y2="126"/><line class="drop" x1="640" y1="130" x2="734" y2="130"/><line class="drop" x1="640" y1="134" x2="734" y2="134"/><line class="drop" x1="640" y1="138" x2="734" y2="138"/><line class="drop" x1="640" y1="142" x2="734" y2="142"/><line class="drop" x1="640" y1="146" x2="734" y2="146"/><line class="drop" x1="640" y1="150" x2="734" y2="150"/><line class="drop" x1="640" y1="154" x2="734" y2="154"/><line class="drop" x1="640" y1="158" x2="734" y2="158"/><line class="drop" x1="640" y1="162" x2="734" y2="162"/><text class="xs dim" x="687" y="110" text-anchor="middle">12 &#215; 14 AWG</text><rect class="box" x="734" y="112" width="212" height="56" rx="3"/><text class="lbl" x="746" y="132">COLUMN A</text><text class="xs dim" x="746" y="149">12 panels &#183; 60 A cap</text><path class="ac" d="M 120 244 H 214"/><circle class="node" cx="120" cy="244" r="3.5"/><rect class="box" x="214" y="216" width="160" height="56" rx="3"/><text class="lbl" x="226" y="236">RSP-320-5</text><text class="xs dim" x="226" y="253">5 V 60 A &#183; PFC</text><line class="feed-pos" x1="374" y1="237" x2="474" y2="237"/><line class="feed-neg" x1="374" y1="251" x2="474" y2="251"/><rect class="fuse" x="404" y="228" width="40" height="18" rx="2"/><rect class="box" x="474" y="216" width="166" height="56" rx="3"/><text class="lbl" x="486" y="236">12-WAY BLOCK</text><text class="xs dim" x="486" y="253">12&#215;20 A + 1&#215;5 A</text><line class="drop" x1="640" y1="222" x2="734" y2="222"/><line class="drop" x1="640" y1="226" x2="734" y2="226"/><line class="drop" x1="640" y1="230" x2="734" y2="230"/><line class="drop" x1="640" y1="234" x2="734" y2="234"/><line class="drop" x1="640" y1="238" x2="734" y2="238"/><line class="drop" x1="640" y1="242" x2="734" y2="242"/><line class="drop" x1="640" y1="246" x2="734" y2="246"/><line class="drop" x1="640" y1="250" x2="734" y2="250"/><line class="drop" x1="640" y1="254" x2="734" y2="254"/><line class="drop" x1="640" y1="258" x2="734" y2="258"/><line class="drop" x1="640" y1="262" x2="734" y2="262"/><line class="drop" x1="640" y1="266" x2="734" y2="266"/><rect class="box" x="734" y="216" width="212" height="56" rx="3"/><text class="lbl" x="746" y="236">COLUMN B</text><text class="xs dim" x="746" y="253">12 panels &#183; 60 A cap</text><path class="ac" d="M 120 348 H 214"/><circle class="node" cx="120" cy="348" r="3.5"/><rect class="box" x="214" y="320" width="160" height="56" rx="3"/><text class="lbl" x="226" y="340">RSP-320-5</text><text class="xs dim" x="226" y="357">5 V 60 A &#183; PFC</text><line class="feed-pos" x1="374" y1="341" x2="474" y2="341"/><line class="feed-neg" x1="374" y1="355" x2="474" y2="355"/><rect class="fuse" x="404" y="332" width="40" height="18" rx="2"/><rect class="box" x="474" y="320" width="166" height="56" rx="3"/><text class="lbl" x="486" y="340">12-WAY BLOCK</text><text class="xs dim" x="486" y="357">12&#215;20 A + 1&#215;5 A</text><line class="drop" x1="640" y1="326" x2="734" y2="326"/><line class="drop" x1="640" y1="330" x2="734" y2="330"/><line class="drop" x1="640" y1="334" x2="734" y2="334"/><line class="drop" x1="640" y1="338" x2="734" y2="338"/><line class="drop" x1="640" y1="342" x2="734" y2="342"/><line class="drop" x1="640" y1="346" x2="734" y2="346"/><line class="drop" x1="640" y1="350" x2="734" y2="350"/><line class="drop" x1="640" y1="354" x2="734" y2="354"/><line class="drop" x1="640" y1="358" x2="734" y2="358"/><line class="drop" x1="640" y1="362" x2="734" y2="362"/><line class="drop" x1="640" y1="366" x2="734" y2="366"/><line class="drop" x1="640" y1="370" x2="734" y2="370"/><rect class="box" x="734" y="320" width="212" height="56" rx="3"/><text class="lbl" x="746" y="340">COLUMN C</text><text class="xs dim" x="746" y="357">12 panels &#183; 60 A cap</text><path class="ac" d="M 120 452 H 214"/><circle class="node" cx="120" cy="452" r="3.5"/><rect class="box" x="214" y="424" width="160" height="56" rx="3"/><text class="lbl" x="226" y="444">RSP-320-5</text><text class="xs dim" x="226" y="461">5 V 60 A &#183; PFC</text><line class="feed-pos" x1="374" y1="445" x2="474" y2="445"/><line class="feed-neg" x1="374" y1="459" x2="474" y2="459"/><rect class="fuse" x="404" y="436" width="40" height="18" rx="2"/><rect class="box" x="474" y="424" width="166" height="56" rx="3"/><text class="lbl" x="486" y="444">12-WAY BLOCK</text><text class="xs dim" x="486" y="461">12&#215;20 A + 1&#215;5 A</text><line class="drop" x1="640" y1="430" x2="734" y2="430"/><line class="drop" x1="640" y1="434" x2="734" y2="434"/><line class="drop" x1="640" y1="438" x2="734" y2="438"/><line class="drop" x1="640" y1="442" x2="734" y2="442"/><line class="drop" x1="640" y1="446" x2="734" y2="446"/><line class="drop" x1="640" y1="450" x2="734" y2="450"/><line class="drop" x1="640" y1="454" x2="734" y2="454"/><line class="drop" x1="640" y1="458" x2="734" y2="458"/><line class="drop" x1="640" y1="462" x2="734" y2="462"/><line class="drop" x1="640" y1="466" x2="734" y2="466"/><line class="drop" x1="640" y1="470" x2="734" y2="470"/><line class="drop" x1="640" y1="474" x2="734" y2="474"/><rect class="box" x="734" y="424" width="212" height="56" rx="3"/><text class="lbl" x="746" y="444">COLUMN D</text><text class="xs dim" x="746" y="461">12 panels &#183; 60 A cap</text><path class="nobond" d="M 984 140 V 452"/><line class="nobond" x1="978" y1="158" x2="990" y2="158"/><line class="nobond" x1="978" y1="262" x2="990" y2="262"/><line class="nobond" x1="978" y1="366" x2="990" y2="366"/><line class="nobond" x1="978" y1="470" x2="990" y2="470"/><path class="xmark" d="M 978 186 l 12 12 M 990 186 l -12 12"/><path class="xmark" d="M 978 290 l 12 12 M 990 290 l -12 12"/><path class="xmark" d="M 978 394 l 12 12 M 990 394 l -12 12"/><text class="xs dim" transform="translate(1022 296) rotate(-90)" text-anchor="middle">0 V RAILS NEVER BONDED</text><rect class="callout" x="34" y="486" width="424" height="112" rx="3"/><text class="lbl" x="48" y="510">AC LOAD IS RMS, NOT WATTS</text><text class="xs" x="48" y="530">Real power  4 &#215; 359 W = 1 437 W</text><text class="xs" x="48" y="548">RSP-320  PF &gt; 0.98  &#8594;  about 12 A RMS at 120 V</text><text class="xs pos" x="48" y="566">LRS-350  no PFC, PF &#8776; 0.5  &#8594;  about 24 A RMS</text><text class="xs" x="48" y="586">Breakers trip on RMS. Size on the RMS figure.</text><line class="rule-l" x1="34" y1="600" x2="1026" y2="600"/><text class="lbl dim" x="34" y="626">DATA, SAME DISPLAY</text><rect class="box" x="34" y="646" width="140" height="52" rx="3"/><text class="lbl" x="46" y="668">PI 5</text><text class="xs dim" x="46" y="686">192.168.50.1</text><path class="eth" d="M 174 672 H 234"/><rect class="box" x="234" y="646" width="140" height="52" rx="3"/><text class="lbl" x="246" y="668">SWITCH</text><text class="xs dim" x="246" y="686">gigabit, unmanaged</text><path class="eth" d="M 374 672 H 430"/><rect class="box" x="430" y="646" width="132" height="52" rx="3"/><text class="lbl" x="442" y="668">CTRL A</text><text class="xs dim" x="442" y="686">.11 &#183; DDP 4048</text><path class="eth" d="M 374 672 H 582"/><rect class="box" x="582" y="646" width="132" height="52" rx="3"/><text class="lbl" x="594" y="668">CTRL B</text><text class="xs dim" x="594" y="686">.12 &#183; DDP 4048</text><path class="eth" d="M 374 672 H 734"/><rect class="box" x="734" y="646" width="132" height="52" rx="3"/><text class="lbl" x="746" y="668">CTRL C</text><text class="xs dim" x="746" y="686">.13 &#183; DDP 4048</text><path class="eth" d="M 374 672 H 886"/><rect class="box" x="886" y="646" width="132" height="52" rx="3"/><text class="lbl" x="898" y="668">CTRL D</text><text class="xs dim" x="898" y="686">.14 &#183; DDP 4048</text></svg></div><figcaption class="tb"><span>E-4</span><span>Display one-line diagram</span><span>1 of 2 displays</span><span>NOT TO SCALE &#183; 2026-09-13</span></figcaption></figure>
+  <div class="warn">
+    <span class="lbl-h">Size the circuit on RMS current, not on watts</span>
+    <p>Four columns at their cap is 1 437 W of real power, which looks like 12 A at 120 V. That
+    is only true if the supply has power factor correction. <b>The LRS-350 does not.</b> Its
+    datasheet has no power-factor row at all, and Note 10 states it fails EN61000-3-2, the
+    harmonic current standard. Its PF is about 0.5, so it draws roughly twice the RMS current
+    its wattage implies &#8212; and a breaker trips on RMS.</p>
+    <p><b>LRS-350-5:</b> about 24 A RMS for four. That needs <b>two 20 A circuits per
+    display</b>, four for both walls.<br>
+    <b>RSP-320-5:</b> PF &gt; 0.98, about 12 A RMS for four. <b>One 20 A circuit per
+    display</b>, with margin.</p>
+    <p>The RSP is about &#36;55 more each. Eight of them costs &#36;440 and removes two dedicated
+    circuits from the build, which is cheaper than an electrician. Its inrush is 20 A against the
+    LRS&#8217;s 60 A, so four of them cold-starting together will not trip a healthy breaker
+    either. Neither supply has remote sense; you trim the ADJ pot by hand on both.</p>
+  </div>
+</section>
+
+<section>
+  <h2>One drop, end to end</h2>
+  <p class="sub">Ninety-six of these get built. Every choice below is about doing it
+  ninety-six times without hating it, and about getting one panel out again afterwards.</p>
+  <figure><div class="sheet-wrap"><svg viewBox="0 0 1060 402" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Drop and controller tap detail"><defs><pattern id="dg" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.35" fill="var(--rule)"/></pattern></defs><rect class="sheet" x="10" y="10" width="1040" height="382" rx="3"/><line class="feed-pos" x1="46" y1="141" x2="96" y2="141"/><line class="feed-neg" x1="46" y1="159" x2="96" y2="159"/><text class="lbl dim" x="46" y="120">BLOCK BUS</text><rect class="fuse" x="96" y="128" width="64" height="26" rx="3"/><text class="mono sm" x="128" y="146" text-anchor="middle">20 A</text><line class="feed-neg" x1="96" y1="159" x2="160" y2="159"/><rect class="ferr" x="160" y="135" width="22" height="12" rx="1"/><rect class="ferr" x="160" y="153"  width="22" height="12" rx="1"/><path class="run-pos" d="M 182 141 H 372 A 26 26 0 1 1 412 141 H 592"/><path class="run-neg" d="M 182 159 H 372 A 26 26 0 1 1 412 159 H 592"/><text class="lbl" x="240" y="202">14 AWG SILICONE</text><text class="xs dim" x="240" y="218">0.4 m at row 6 &#183; 1.6 m at row 1 or 12</text><text class="xs dim" x="392" y="72" text-anchor="middle">service loop</text><rect class="pp-pos" x="592" y="126" width="52" height="22" rx="2"/><rect class="pp-neg" x="592" y="152" width="52" height="22" rx="2"/><line class="hair" x1="604" y1="126" x2="604" y2="174"/><rect class="pp-pos" x="650" y="126" width="52" height="22" rx="2"/><rect class="pp-neg" x="650" y="152" width="52" height="22" rx="2"/><line class="hair" x1="690" y1="126" x2="690" y2="174"/><line class="mate" x1="646" y1="116" x2="646" y2="184"/><text class="lbl" x="676" y="202" text-anchor="middle">ANDERSON PP30</text><text class="xs dim" x="676" y="218" text-anchor="middle">crimp &#183; genderless &#183; keyed</text><line class="run-pos" x1="702" y1="141" x2="806" y2="141"/><line class="run-neg" x1="702" y1="159" x2="806" y2="159"/><text class="xs dim" x="800" y="120" text-anchor="end">panel&#8217;s own 18 AWG</text><rect class="panel" x="806" y="84" width="200" height="132" rx="2"/><rect class="dots"  x="806" y="84" width="200" height="132" rx="2"/><text class="lbl" x="822" y="108">PANEL</text><text class="xs dim" x="822" y="126">16 &#215; 16 &#183; 15.4 A max</text><line class="feed-pos" x1="46" y1="323" x2="96" y2="323"/><line class="feed-neg" x1="46" y1="337" x2="96" y2="337"/><text class="lbl dim" x="46" y="302">BLOCK BUS</text><rect class="fuse" x="96" y="310" width="58" height="24" rx="3"/><text class="mono sm" x="125" y="327" text-anchor="middle">5 A</text><line class="feed-neg" x1="96" y1="337" x2="154" y2="337"/><line class="run-pos" x1="154" y1="323" x2="392" y2="323"/><line class="run-neg" x1="154" y1="337" x2="392" y2="337"/><text class="xs dim" x="200" y="364">16 AWG, kept short</text><rect class="box" x="392" y="296" width="210" height="68" rx="3"/><text class="lbl" x="404" y="318">CONTROLLER J13</text><text class="xs dim" x="404" y="336">screw terminal, 5 V + 0 V</text><text class="xs dim" x="640" y="326">A panel inrush must not dip the rail the ESP32 runs on.</text><text class="xs dim" x="640" y="346">Tap ahead of the panel fuses and keep the lead short.</text></svg></div><figcaption class="tb"><span>E-5</span><span>Drop and controller tap detail</span><span>typical of 12</span><span>NOT TO SCALE &#183; 2026-09-13</span></figcaption></figure>
+  <h3>Why 20 A on a 15.4 A load</h3>
+  <p class="col">A blade fuse carries its rating continuously and opens at roughly twice it. A
+  15 A fuse would sit at 103 % whenever a panel went white, and it would nuisance-blow at the
+  worst possible moment. 20 A leaves the panel its full output and still protects 14 AWG
+  silicone, which is good for about 32 A in free air.</p>
+  <h3>Why not copper-clad aluminium</h3>
+  <p class="col">Cheap &#8220;silicone&#8221; wire on marketplaces is often CCA. It has around
+  60 % of the conductivity for the same gauge, it work-hardens, and it creeps in a crimp until
+  the joint heats up. At 15 A a foot from a panel that is not a saving. Buy stranded pure copper
+  and check the strand count on arrival.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Run</th><th>Conductor</th><th class="n">Design current</th>
+    <th class="n">Length</th><th class="n">Round-trip drop</th></tr></thead>
+    <tbody><tr><td>Supply pigtails</td><td class='spec'>3 &#215; 12 AWG per polarity, fused 30 A each</td><td class='n'>20 A each</td><td class='n'>1.5 ft</td><td class='n'>&#8212;</td></tr><tr><td>Convergence &#8594; unit</td><td class='spec'>6 AWG welding cable, one pair</td><td class='n'>60 A</td><td class='n'>4.5 ft</td><td class='n'>0.21 V</td></tr><tr><td>SB120 connector</td><td class='spec'>two mated poles in the loop, 0.5 m&#8486; each</td><td class='n'>60 A</td><td class='n'>&#8212;</td><td class='n'>0.06 V</td></tr><tr><td>Block &#8594; row 6 or 7</td><td class='spec'>14 AWG silicone</td><td class='n'>15.4 A peak</td><td class='n'>1.3 ft</td><td class='n'>0.10 V</td></tr><tr><td>Block &#8594; row 1 or 12</td><td class='spec'>14 AWG silicone</td><td class='n'>15.4 A peak</td><td class='n'>5.2 ft</td><td class='n'>0.41 V</td></tr><tr><td>Block &#8594; controller</td><td class='spec'>16 AWG silicone</td><td class='n'>0.5 A</td><td class='n'>2 ft</td><td class='n'>&#8212;</td></tr></tbody>
+  </table>
+  </div>
+  <p class="col" style="margin-top:14px;font-size:15px;color:var(--ink-2)">The 0.41 V on the
+  longest drop is the worst case: that one panel white while the rest of the column is dark.
+  Under the 60 A cap a typical panel pulls about 5 A and drops 0.13 V. A single 6 AWG feeder
+  saves 0.06 V over the three 12 AWG, but it will not fit the supply&#8217;s M4 terminal, so it
+  also buys you a bus bar, two lug sizes and a hammer crimper.</p>
+</section>
+
+<section>
+  <h2>Nothing here needs a soldering iron</h2>
+  <p class="sub">Every joint in this design is a crimp or a screw terminal. That is not a
+  convenience; it is why the connector is a Powerpole and not an XT30.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Joint</th><th>Method</th><th>Tool</th></tr></thead>
+    <tbody>
+      <tr><td>Feeder &#8594; supply</td><td class="spec">bootlace ferrule, one per screw terminal</td>
+        <td class="spec">ratcheting ferrule crimper</td></tr>
+      <tr><td>Convergence, supply side</td><td class="spec">three 12 AWG into one SB120 6 AWG contact, per pole</td>
+        <td class="spec">Powerwerx SBcrimp hex crimper</td></tr>
+      <tr><td>Convergence, run side</td><td class="spec">6 AWG welding into an SB120 contact, per pole</td>
+        <td class="spec">Powerwerx SBcrimp hex crimper</td></tr>
+      <tr><td>Feeder &#8594; block</td><td class="spec">6 AWG ring, M5 stud</td>
+        <td class="spec">hex or hammer crimper, 6 AWG die</td></tr>
+      <tr><td>Drop &#8594; block</td><td class="spec">14 AWG ring terminal under the output screw &#8212; not a fork</td>
+        <td class="spec">ratcheting terminal crimper</td></tr>
+      <tr><td>Drop &#8594; panel</td><td class="spec">Powerpole PP30, Anderson 1331</td>
+        <td class="spec">TRIcrimp</td></tr>
+      <tr><td>Panel lead &#8594; drop</td><td class="spec">Powerpole PP15, Anderson 1332</td>
+        <td class="spec">TRIcrimp</td></tr>
+      <tr><td>Controller 5 V &#8594; J13</td><td class="spec">bootlace ferrule into the screw terminal</td>
+        <td class="spec">ratcheting ferrule crimper</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Two contact sizes, one housing</h3>
+  <p class="col">A PP30 contact&#8217;s barrel is cut for 12&#8211;14 AWG. The panels ship with
+  thinner power leads, usually 18 or 20 AWG, and 18 AWG rattles inside a PP30 barrel and will not
+  crimp. Use a <b>PP15</b> contact on that side. The 1327 housing is identical across PP15, PP30
+  and PP45, so a PP15 contact mates a PP30 contact with no adapter and no second connector
+  system.</p>
+  <p class="col">That makes the joint 15 A against a panel&#8217;s 15.4 A absolute peak, and it
+  changes nothing real. The panel&#8217;s own 18 AWG lead is already the narrowest conductor in
+  the chain and the manufacturer chose it. A fatter contact would not fix the wire behind it.</p>
+  <figure style="margin-top:30px"><div class="sheet-wrap"><svg viewBox="0 0 1060 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SB120 at the feeder convergence"><rect class="sheet" x="10" y="10" width="1040" height="500" rx="3"/><rect class="box" x="40" y="90" width="150" height="330" rx="3"/><text class="lbl" x="54" y="118">SUPPLY</text><text class="xs dim" x="54" y="136">3 +V &#183; 3 &#8722;V screws</text><line class="run-pos" x1="190" y1="170" x2="250" y2="170"/><rect class="fuse" x="250" y="159" width="54" height="22" rx="3"/><line class="run-pos" x1="190" y1="200" x2="250" y2="200"/><rect class="fuse" x="250" y="189" width="54" height="22" rx="3"/><line class="run-pos" x1="190" y1="230" x2="250" y2="230"/><rect class="fuse" x="250" y="219" width="54" height="22" rx="3"/><path class="run-pos" d="M 304 170 H 360 L 410 200 H 452" fill="none"/><path class="run-pos" d="M 304 200 H 452" fill="none"/><path class="run-pos" d="M 304 230 H 360 L 410 200" fill="none"/><text class="xs dim" x="250" y="150" >3 &#215; 30 A, + side only</text><path class="run-neg" d="M 190 330 H 360 L 410 360 H 452" fill="none"/><path class="run-neg" d="M 190 360 H 452" fill="none"/><path class="run-neg" d="M 190 390 H 360 L 410 360" fill="none"/><text class="xs dim" x="196" y="416">&#8722; side unfused</text><rect class="box" x="452" y="86" width="150" height="338" rx="3"/><rect class="box" x="618" y="86" width="150" height="338" rx="3"/><text class="lbl" x="466" y="114">SB120</text><text class="xs dim" x="466" y="132">supply side</text><text class="lbl" x="632" y="114">SB120</text><text class="xs dim" x="632" y="132">run side</text><line class="mate" x1="610" y1="76" x2="610" y2="434"/><text class="xs dim" x="610" y="68" text-anchor="middle">MATES</text><rect class="chip" x="462" y="188" width="130" height="24" rx="2"/><rect class="chip" x="462" y="348" width="130" height="24" rx="2"/><rect class="chip" x="628" y="188" width="130" height="24" rx="2"/><rect class="chip" x="628" y="348" width="130" height="24" rx="2"/><text class="xs dim" x="466" y="238">6 AWG contact</text><text class="xs dim" x="466" y="254">75 % fill, 3 &#215; 12</text><text class="xs dim" x="632" y="238">6 AWG contact</text><text class="xs dim" x="632" y="254">one welding cable</text><line class="feed-pos" x1="768" y1="200" x2="880" y2="200"/><line class="feed-neg" x1="768" y1="360" x2="880" y2="360"/><rect class="box" x="880" y="86" width="140" height="338" rx="3"/><text class="lbl" x="894" y="114">UNIT</text><text class="xs dim" x="894" y="132">M5 studs</text><text class="xs dim" x="790" y="182">6 AWG</text><text class="xs dim" x="790" y="342">welding</text><rect class="callout" x="452" y="446" width="568" height="52" rx="3"/><text class="xs" x="468" y="468">SB120-06-GRY &#183; 120 A, 600 V &#183; genderless, colour-keyed, polarised &#183; one housing carries both poles</text><text class="xs" x="468" y="486">0.5 m&#8486; per mated pole &#8594; 0.06 V across the two at 60 A. Two kits make one pair.</text></svg></div><figcaption class="tb"><span>E-6</span><span>SB120 at the feeder convergence</span><span>1 pair per column</span><span>NOT TO SCALE &#183; 2026-09-27</span></figcaption></figure>
+  <div class="warn">
+    <span class="lbl-h">Check one panel before ordering contacts</span>
+    <p>Measure the gauge of its power leads, and look for screw terminals on the back. If the
+    panels have terminals, take that route instead: a short 14 AWG panel tail, ferrules at the
+    panel and a PP30 pair at the other end. The tail stays with the panel, the whole joint is
+    30 A, and it still unplugs in seconds.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Mechanical</h2>
+  <ul class="plain">
+    <li><b>Take the weight at the top.</b> Both looms hang from the top rail. The P-clips below
+    guide the run; they do not carry it. No connector should ever be in tension.</li>
+    <li><b>Six inches of slack at every panel.</b> One full turn of service loop before the
+    connector. It is what lets you unclip a panel and turn it over on the ladder.</li>
+    <li><b>Split loom, two sizes.</b> 3/8 in for the thick end of the bundle, 1/4 in past
+    row 3 where it is down to a pair or two.</li>
+    <li><b>Power up one stile, data up the other.</b> Cheap insurance against pickup on a
+    400 ns data edge, and it makes the wall readable when something is wrong.</li>
+    <li><b>Label both ends of every drop</b> with the column and row, <code>C2-R07</code>. Do it
+    as you build. Nobody has ever traced 96 unlabelled red wires and enjoyed it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Commissioning, in this order</h2>
+  <ol class="steps"><li><b>Bench the supply alone.</b> Set ADJ to 5.00 V with nothing connected. Do this before it is four feet up a wall.</li><li><b>Check + against &#8722; with the supply unplugged.</b> It will beep for a moment and stop. That is normal: a discharged output capacitor is indistinguishable from a short until the meter&#8217;s own 1 mA has charged it, which takes about a tenth of a second. Then the reading climbs into the k&#8486; and beyond. <b>A beep that never stops is the fault.</b> Short the terminals before you repeat the test, or the caps are still charged and you will see nothing.</li><li><b>Fit the three feeder pairs, one conductor per screw.</b> Never bridge two supply terminals with one wire. Confirm polarity at the block with the supply off, then power up with no drops fitted.</li><li><b>Fuse one drop, connect one panel, run the bench firmware.</b> Then add drops one row at a time. A wiring error costs one panel, not twelve.</li><li><b>Drive the column to full white with the 60 A cap in force.</b> Measure at the row 1 and row 12 terminals, not at the supply.</li><li><b>Trim ADJ until the furthest panel reads 5.00 V under load.</b> Expect about 5.15 V at the supply. Never exceed 5.3 V at the nearest panel.</li><li><b>Come back after ten minutes with an IR thermometer.</b> Block terminals, feeder lugs and every Powerpole should be near ambient. Anything above about 50 &#176;C is a bad crimp, and it will only get worse.</li></ol>
+</section>
+
+<section>
+  <h2>What it costs</h2>
+  <p class="sub">Street prices, one display of four columns. Supplies included.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Item</th><th>Spec</th><th class="n">Qty</th><th class="n">Unit &#36;</th>
+    <th class="n">&#36;</th></tr></thead>
+    <tbody><tr><td>5 V supply</td><td class='spec'>Mean Well RSP-320-5, 5 V 60 A, with PFC</td><td class='n'>4</td><td class='n'>95.00</td><td class='n'>380</td></tr><tr><td>Pigtails</td><td class='spec'>12 AWG silicone, six per column at 18 in</td><td class='n'>36 ft</td><td class='n'>0.60</td><td class='n'>22</td></tr><tr><td>Feeder</td><td class='spec'>6 AWG welding cable, one pair per column</td><td class='n'>48 ft</td><td class='n'>1.80</td><td class='n'>86</td></tr><tr><td>Feeder protection</td><td class='spec'>inline ATC holder + 30 A fuse, 3 per column</td><td class='n'>12</td><td class='n'>3.50</td><td class='n'>42</td></tr><tr><td>Lugs</td><td class='spec'>6 AWG &#8212; M5 ring at the unit, lug at the convergence</td><td class='n'>16</td><td class='n'>0.80</td><td class='n'>13</td></tr><tr><td>Distribution</td><td class='spec'>DaierTek 12-way, negative bus, cover, LED indicators</td><td class='n'>4</td><td class='n'>15.99</td><td class='n'>64</td></tr><tr><td>Connectors</td><td class='spec'>Anderson SB120-06-GRY kit, two per column</td><td class='n'>8</td><td class='n'>17.66</td><td class='n'>141</td></tr><tr><td>Panel fuses</td><td class='spec'>20 A ATC, with spares</td><td class='n'>60</td><td class='n'>0.25</td><td class='n'>15</td></tr><tr><td>Controller tap</td><td class='spec'>inline ATC holder + 5 A fuse</td><td class='n'>4</td><td class='n'>4.00</td><td class='n'>16</td></tr><tr><td>Drops</td><td class='spec'>14 AWG silicone, red + black</td><td class='n'>320 ft</td><td class='n'>0.45</td><td class='n'>144</td></tr><tr><td>Connector housings</td><td class='spec'>Anderson 1327, bonded red/black pair</td><td class='n'>96</td><td class='n'>0.45</td><td class='n'>43</td></tr><tr><td>Drop contacts</td><td class='spec'>Anderson 1331 PP30, 12&#8211;14 AWG</td><td class='n'>96</td><td class='n'>0.32</td><td class='n'>31</td></tr><tr><td>Panel contacts</td><td class='spec'>Anderson 1332 PP15, 16&#8211;20 AWG</td><td class='n'>96</td><td class='n'>0.26</td><td class='n'>25</td></tr><tr><td>Ferrules</td><td class='spec'>14 AWG bootlace, 200 pc kit</td><td class='n'>1</td><td class='n'>25.00</td><td class='n'>25</td></tr><tr><td>Loom</td><td class='spec'>3/8 in split loom</td><td class='n'>60 ft</td><td class='n'>0.40</td><td class='n'>24</td></tr><tr><td>Clips</td><td class='spec'>screw-mount P-clip, 3/8 in</td><td class='n'>100</td><td class='n'>0.20</td><td class='n'>20</td></tr><tr><td>Consumables</td><td class='spec'>heatshrink, wire labels, ties</td><td class='n'>&#8212;</td><td class='n'>&#8212;</td><td class='n'>40</td></tr><tr class='total'><td>Per display</td><td class='spec'>4 columns, 48 panels &#183; enclosures and door hardware not yet costed</td><td class='n'></td><td class='n'></td><td class='n'>1131</td></tr><tr class='total'><td>Both displays</td><td class='spec'>plus &#36;183 of crimp tools including the SB hex crimper</td><td class='n'></td><td class='n'></td><td class='n'>2445</td></tr></tbody>
+  </table>
+  </div>
+</section>
+
+<section class="rev">
+  <h2>Revisions to what I told you before</h2>
+  <p><b>Anderson PP30 replaces XT30.</b> XT30&#8217;s solder cup does not take 14 AWG, its
+  ready-made pigtails come with 16 AWG, and 96 panels is 384 solder joints either way. Powerpole
+  is crimp-only, genderless, and the same housing family the rest of the DC world uses. It costs
+  about &#36;60 more per display and one &#36;45 crimp tool.</p>
+  <p><b>RSP-320-5 replaces LRS-350-5, and 3 &#215; 12 AWG replaces the 6 AWG feeder.</b> The
+  LRS has no power factor correction, so four of them pull about 24 A RMS rather than the 12 A
+  their wattage suggests. And 6 AWG will not fit the supply&#8217;s M4 terminal anyway: the
+  three +V screws are parallel taps on one rail, meant to be fed by three conductors. Running
+  those three the whole way up deletes the bus bar, the 6 AWG and the lug crimper for the same
+  money and 0.06 V.</p>
+  <p><b>The block and the controller are now one unit on a hinged door.</b> They were drawn
+  facing each other across the frame, on the theory that power up one stile and data up the other
+  falls out of the geometry. It does not any more: both looms leave the same box, so the split has
+  to be made deliberately at the door. What the change buys is access &#8212; every fuse, every
+  terminal and the devkit&#8217;s USB port are reachable by opening a door, without a ladder and
+  without touching a panel.</p>
+  <p><b>The three feeder conductors now converge at the supply, not at the unit.</b> They were
+  going to run the whole 4.5 ft as three pairs and meet on the block&#8217;s stud. Instead, short
+  fused 12 AWG pigtails leave the supply&#8217;s six screws and are crimped into one 6 AWG lug per
+  polarity within a foot, and a single 6 AWG welding-cable pair makes the run. The electrical case
+  is a wash &#8212; 13.3 mm&#178; of copper against 9.9 mm&#178;, 0.21 V against 0.25 V. The real
+  reason is the door: <b>conductors crossing the hinge drop from six to two</b>, and one flexible
+  cable dresses around a hinge in a way a six-conductor bundle never will. Welding cable, not
+  building wire, for the same reason.</p>
+  <p><b>A 6 AWG ring on the stud is still how it lands</b>, so the ABYC four-per-stud question is
+  moot either way. The individual 30 A fuses stay in the pigtails, upstream of the convergence:
+  merging the conductors does not merge their protection.</p>
+  <p><b>The distribution block is a DaierTek 12-way, &#36;15.99</b> (Amazon B0CGT91KTR).
+  Twelve circuits, 100 A per block, 30 A per circuit, 32 V DC, transparent cover with a push latch,
+  blown-fuse LEDs. It ships with <em>two</em> power terminals alongside twenty-four device
+  terminals, which is what settles the thing that mattered: <b>dedicated + and &#8722; inputs</b>,
+  separate from the twelve output pairs, so all twelve negative positions stay free for panel
+  returns. Its stud is <b>M5</b>, rated #4&#8211;6 AWG.</p>
+  <p>The Blue Sea 5026 was specified here first at &#36;43.29, and publishes everything the
+  DaierTek does not &#8212; #10-32 studs both sides, tinned copper buses. That is the trade:
+  &#36;110 a display against two specifications that now have to be checked on arrival instead of
+  before ordering. Both are in Still open.</p>
+  <p><b>The supply on hand is an S-350-5, 5 V 70 A.</b> Derated to about 50 A continuous for an
+  unbranded unit, that is one full column with the firmware cap set to match, or roughly a quarter
+  of full white across twelve panels. It has no power factor correction, so the RMS argument below
+  still points at the RSP-320-5 for the finished wall &#8212; one of these is fine on a 15 A
+  circuit, four are not.</p>
+  <p><b>The convergence is an SB120 connector, decided.</b> A sealed butt splice was the cheaper
+  option and is now rejected: across eight columns, being able to unplug a unit and carry it to the
+  bench is worth more than the &#36;283 and the 0.06 V. One housing carries both poles, so it is two
+  kits a column, not four. The 0.06 V is the honest cost &#8212; it puts the feeder at 0.273 V,
+  over the 0.25 V target, recoverable on the supply&#8217;s ADJ because every panel sits downstream
+  of it.</p>
+  <p><b>The bill is about &#36;750 a display, not &#36;520.</b> I under-counted the 14 AWG: 48
+  drops averaging a metre is 320 ft of wire once you count both conductors, and that alone is
+  &#36;144. The rest of the design is unchanged.</p>
+</section>
+
+</div>
+
+</body></html>
