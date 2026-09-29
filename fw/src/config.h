@@ -52,6 +52,45 @@ static constexpr int    PANEL_LEDS  = 256;
 static constexpr int    NUM_LEDS    = PANEL_LEDS * NUM_OUTPUTS;   // 3072
 static constexpr size_t FRAME_BYTES = (size_t)NUM_LEDS * 3;       // 9216
 
+// ---- power cap ------------------------------------------------------------
+// The one line the whole electrical design rests on.
+//
+// A 16x16 panel at full white is 256 LEDs x 60 mA = 15.4 A. Twelve of them is
+// 184 A a column, and no supply in this design delivers that - an RSP-320-5 is
+// 60 A, and the S-350-5 on hand derates to about 50 A continuous. So the budget
+// is enforced here, in software, and the supply is sized to the cap rather than
+// to the arithmetic. hw/POWER-RISER.html sizes every conductor on the
+// assumption that this is present and working.
+//
+// FastLED applies it inside show(), BEFORE any controller clocks out: it sums
+// the unscaled power of every registered controller and scales the whole frame
+// down to fit. Two properties matter here and both were read out of the library
+// rather than assumed (FastLED.cpp, m_pPowerFunc in CFastLED::show()):
+//   - it is driver-agnostic, so it works on the S3 LCD_CAM parallel path, not
+//     just on RMT;
+//   - it sums ACROSS controllers, so twelve addLeds() outputs are budgeted
+//     together. That is exactly what a per-column cap needs.
+//
+// It only engages on very bright frames. The cap is about a third of full
+// white, so a frame has to be almost entirely white before it bites - at which
+// point a second 8-bit quantisation of an all-white frame is not something
+// anyone can see. That is why setBrightness stays at 255 in leds.cpp: real
+// brightness is done on the Pi in 16 bit, and this is a ceiling, not a level.
+//
+// SET THIS TO MATCH THE SUPPLY ACTUALLY FEEDING THE COLUMN. Override it rather
+// than editing this file:
+//   PLATFORMIO_BUILD_FLAGS="-DCOLUMN_MAX_MA_CFG=50000" pio run    # S-350-5
+//
+// NOT YET CONFIRMED ON HARDWARE. Before trusting it, drive one column to full
+// white and put a clamp meter on the feeder: it must sit at the cap, not climb
+// toward 184 A. A cap that silently fails to engage is worse than no cap at
+// all, because the wiring was sized on the assumption that it does.
+#ifndef COLUMN_MAX_MA_CFG
+#define COLUMN_MAX_MA_CFG 60000
+#endif
+static constexpr uint32_t COLUMN_MAX_MA = COLUMN_MAX_MA_CFG;
+static constexpr uint8_t  SUPPLY_VOLTS  = 5;
+
 // ---- wire -----------------------------------------------------------------
 static constexpr uint16_t DDP_PORT  = 4048;
 static constexpr uint16_t CTRL_PORT = 4049;   // announce / assign / OTA

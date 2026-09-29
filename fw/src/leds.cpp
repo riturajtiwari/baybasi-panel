@@ -13,7 +13,11 @@
 // FastLED wraps the same class of S3 LCD_CAM driver but tracks which IDF
 // versions it misbehaves on and refuses to build on them - see the guards at
 // the top of platforms/esp/32/clockless_i2s_esp32s3.h, which hard error on
-// 5.1.x and 5.3.2 and tell you to move to 5.4+. We are on 5.5.5.
+// 5.1.x and 5.3.2 and tell you to move to 5.4+.
+//
+// We are on ESP-IDF 5.4.2 (pioarduino 54.03.21-2). That is a WINDOW, not a
+// floor: 5.5.x compiles and boots but cannot open the LCD bus. platformio.ini
+// carries the failure text. Do not read "5.4+" here as permission to upgrade.
 //
 // -DFASTLED_USES_ESP32S3_I2S in platformio.ini is what selects it: it makes
 // WS2812Controller800Khz resolve to ClocklessController_I2S_Esp32_WS2812, so
@@ -65,14 +69,28 @@ void begin() {
     FastLED.addLeds<WS2812B, 42, RGB>(&g_leds[10 * PANEL_LEDS], PANEL_LEDS);
     FastLED.addLeds<WS2812B, 47, RGB>(&g_leds[11 * PANEL_LEDS], PANEL_LEDS);
 
-    // Brightness is done on the Pi, in 16 bit, before dithering. Anything
-    // other than full scale here would quantise it a second time.
+    // The column power cap, and why brightness stays at full scale.
+    //
+    // Brightness is done on the Pi, in 16 bit, before dithering, so anything
+    // other than 255 here would quantise it a second time on every frame. The
+    // cap is not brightness: it is a ceiling that only engages when a frame
+    // would otherwise exceed the supply, which for real content is almost
+    // never. See config.h for the number, and for the clamp-meter check that
+    // has not been done yet.
+    //
+    // Registered before the first show(). FastLED reads it inside show(), so
+    // this covers solid(), identify and the fade path as well as normal frames.
+    FastLED.setMaxPowerInVoltsAndMilliamps(SUPPLY_VOLTS, COLUMN_MAX_MA);
     FastLED.setBrightness(255);
     FastLED.clear(true);
 
+    // The cap is logged because it is the one thing in this firmware whose
+    // absence is invisible until a 60 A supply is asked for 184 A. If a board
+    // on a wall does not print this line, it is not capped.
     log_i("LED driver up (FastLED S3/I2S): %d outputs x %d LEDs = %d px, "
-          "%u bytes/frame", NUM_OUTPUTS, PANEL_LEDS, NUM_LEDS,
-          (unsigned)FRAME_BYTES);
+          "%u bytes/frame, capped at %u mA @ %u V", NUM_OUTPUTS, PANEL_LEDS,
+          NUM_LEDS, (unsigned)FRAME_BYTES, (unsigned)COLUMN_MAX_MA,
+          (unsigned)SUPPLY_VOLTS);
 }
 
 void show(const uint8_t *frame) {

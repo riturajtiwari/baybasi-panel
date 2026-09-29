@@ -194,47 +194,61 @@ Consequence for the build: every panel needs a power drop from the riser as
 well as a data lead from the board. That is more wiring, and it is the right
 trade. See the power-riser design for the distribution.
 
-## Devkit header pitch - batch 1 vs batch 2 (2026-09-15)
+## Devkit header pitch - rev A 22.86 mm, rev B 25.4 mm (settled 2026-09-21)
 
-A1L/A1R are fitted at **22.86 mm (0.900 in)**. **CONFIRMED from Espressif's own
-dimension drawing**, DXF_ESP32-S3-DevKitC-1_V1.1_20220429.pdf: board width
-25.40 mm, 1.27 mm from each board edge to the pin-row centreline, so
-25.40 - 1.27 - 1.27 = **22.86 mm**.
+**Rev B is fitted at 25.4 mm. Rev A - batch 1, five boards - is at 22.86 mm.**
+Two boards that look identical and take different devkits. This was the whole
+point of the rev B respin; the only other change is SW1.
+
+The confusion this section exists to prevent: **25.40 mm is the official
+DevKitC-1's board WIDTH, and 22.86 mm is its row spacing.** Espressif's own
+dimension drawing gives both - board width 25.40, 1.27 mm from each edge to the
+pin-row centreline, so 25.40 - 1.27 - 1.27 = 22.86. Their difference is also
+2.54 mm, so mixing the two yields "exactly one pitch" as an artefact and reads
+like confirmation. Rev A was never wrong for the part it was drawn for.
 
   https://dl.espressif.com/dl/schematics/esp_idf/DXF_ESP32-S3-DevKitC-1_V1.1_20220429.pdf
 
-Batch 1 (five boards) is correct for that part. **The design spacing was never
-wrong** - beware of sources claiming official DevKitC boards are 25.4 mm between
-rows; that is the board WIDTH, and both numbers appear on the same drawing.
+The third-party ESP32-S3 boards actually in hand are at **25.4 mm** between
+rows - one 2.54 mm pitch wider than Espressif's, same pinout pad for pad. They
+are about 28 mm wide, not 25.4. They do not seat in a rev A board and must not
+be forced.
 
-The third-party ESP32-S3 boards bought for the bench are at **25.4 mm** between
-rows - exactly one 2.54 mm pitch wider. **CONFIRMED 2026-09-15 by direct hole
-centre-to-centre measurement on a bare, unsoldered PCB**, which is the only
-measurement that settles this. Same pinout, pad for pad; only the pitch differs.
-They do not seat, and must not be forced.
+**Measure hole centre to hole centre, on a bare unsoldered board, or do not
+measure at all.** A photograph cannot settle it: the board and the ruler are
+not coplanar, so the parallax is the same order as the difference being
+measured. Confirmed that way 2026-09-15, and independently from the shipped
+fabrication data:
 
-Do not re-open this by comparing board widths. 25.40 mm is the official board's
-WIDTH and 22.86 mm its row spacing; their difference is also 2.54 mm, so mixing
-the two yields "exactly one pitch" as an artefact and looks like confirmation.
-The third-party board is ~28 mm wide, not 25.4. **Measure hole centre to hole
-centre, on a bare board, or do not measure at all.**
-
-Decide before ordering batch 2, because it determines both:
-
-| | Devkit | A1L/A1R spacing | Batch 1 |
+| Gerber zip | A1L column X | A1R column X | Spacing |
 |---|---|---|---|
-| **Standardise on Espressif** | official DevKitC-1, ~$16 | leave at 22.86 | works as built |
-| **Standardise on the clone** | what is already in hand | change to 25.4 in `gen_pcb.py` | needs an adapter |
+| `baybasi-ctrl-20260907-gerbers.zip` (rev A) | 135.570 | 158.430 | **22.860 mm** |
+| `baybasi-ctrl-20260921-gerbers.zip` (rev B) | 135.570 | 160.970 | **25.400 mm** |
+
+22 holes in each column on 2.54 pitch over the same Y span. A1L never moved;
+only A1R did, by exactly one pitch. **Verify a shipped board's geometry from
+the `.drl` inside the gerber zip, not from the `.kicad_pcb`** - the zip is what
+the fab actually cut.
 
 The spacing lives in one place, `gen_pcb.py`:
 
-    POS['A1R'] = (A1_PAD1[0] + 22.86, A1_PAD1[1], 0)
+    A1_PITCH   = 25.4
+    A1_PAD1    = (35.57, 17.0)
+    POS['A1L'] = (A1_PAD1[0], A1_PAD1[1], 0)
+    POS['A1R'] = (A1_PAD1[0] + A1_PITCH, A1_PAD1[1], 0)
 
-`A1_BODY` and the silkscreen outline derive from `A1_PAD1`, so they follow.
+`A1_BODY` and the silkscreen outline derive from `A1_PAD1`, so they follow. The
+silkscreen carries the revision for exactly this reason - **read the board
+before you pick a devkit for it.**
 
-Whichever way it goes, **order two devkits and confirm one seats before buying
-the rest.** Not because the geometry is in doubt any more, but because a week
-and $32 is cheap against eight wrong boards.
+### Buying devkits
+
+**Order two and confirm one seats before buying the rest.** Not because the
+geometry is in doubt any more, but because a week and $32 is cheap against
+eight wrong boards.
+
+For rev B, buy the same third-party 25.4 mm boards already in hand. The
+official part is only needed for a rev A board.
 
 Orderable part: **ESP32-S3-DevKitC-1-N8R8**. DigiKey and Mouser stock it; so does
 Espressif's own Amazon storefront, ASIN B09MHP42LY:
