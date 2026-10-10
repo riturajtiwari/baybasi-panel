@@ -352,7 +352,11 @@ def create_app(wall: Wall, library: Library, *, status_dir: Optional[Path] = Non
             wall.controller_by_column(col)
         except (ValueError, KeyError):
             return jsonify({"error": f"no column {col} in this wall"}), 400
-        ok = control.assign(mac, col)
+        from .control import DuplicateColumn, SwitchConfigured
+        try:
+            ok = control.assign(mac, col)
+        except (DuplicateColumn, SwitchConfigured) as e:
+            return jsonify({"error": str(e)}), 409
         return jsonify({"ok": ok})
 
     @app.post("/api/controllers/<mac>/identify")

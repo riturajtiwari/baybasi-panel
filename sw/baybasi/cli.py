@@ -279,16 +279,20 @@ def cmd_discover(args) -> int:
 
 
 def cmd_assign(args) -> int:
-    from .control import ControlPlane, DuplicateColumn
+    from .control import ControlPlane, DuplicateColumn, SwitchConfigured
     wall = _wall(args)
     cp = ControlPlane(wall, table_path=Path(args.data) / "controllers.json",
                       listen=False)
     try:
         ok = cp.assign(args.mac, args.column, force=args.force)
-    except DuplicateColumn as e:
+    except (DuplicateColumn, SwitchConfigured) as e:
         print(f"refused: {e}")
         return 2
     print(f"assign {args.mac} -> column {args.column}: {'sent' if ok else 'FAILED'}")
+    # This command does not listen, so it cannot see whether the board has a
+    # column switch. A rev B board refuses the command itself.
+    print("  a board with a column switch refuses this and keeps its switch "
+          "setting; check `baybasi discover`")
     return 0 if ok else 1
 
 

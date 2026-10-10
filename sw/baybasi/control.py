@@ -12,7 +12,8 @@ in, watch its MAC appear, tell it which column it is.
 Messages are one-line JSON.  Announcements are broadcast by the controller
 every 2 s; commands are unicast by the Pi and acknowledged.
 
-    controller -> Pi   {"t":"announce","mac":"...","col":0,"fw":"0.1.0", ...}
+    controller -> Pi   {"t":"announce","mac":"...","col":0,"col_src":"dip",
+                        "fw":"0.2.0+c55754e", ...}
     Pi -> controller   {"t":"assign","mac":"...","col":2,"ip":"192.168.50.13"}
     Pi -> controller   {"t":"identify","mac":"..."}          flash the status LED
     Pi -> controller   {"t":"ota","url":"http://192.168.50.1:8080/fw.bin",...}
@@ -27,6 +28,7 @@ import socket
 import threading
 import time
 from dataclasses import dataclass, field, asdict
+from collections import Counter
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -50,6 +52,10 @@ class ControllerInfo:
     rssi: Optional[int] = None
     last_seen: float = field(default_factory=time.time)
     assigned_column: Optional[int] = None   # what the Pi's table says
+    # Where the board got its column: "dip" (rev B, its own switch), "nvs"
+    # (rev A, commissioned by this Pi) or "none". "" means firmware too old
+    # to say.
+    col_src: str = ""
 
     @property
     def age(self) -> float:
@@ -65,7 +71,11 @@ class ControllerInfo:
             return "offline"
         if self.column is None:
             return "unassigned"
-        if self.assigned_column is not None and self.column != self.assigned_column:
+        # A switch board's column IS its switch. The Pi's table only records
+        # NVS commissioning and has no say over it, so a stale entry from
+        # before the board had a switch is not a mismatch.
+        if (self.col_src != "dip" and self.assigned_column is not None
+                and self.column != self.assigned_column):
             return "mismatch"
         return "ok"
 
@@ -73,6 +83,17 @@ class ControllerInfo:
         d = asdict(self)
         d.update(age_s=round(self.age, 1), online=self.online, state=self.state)
         return d
+
+
+class SwitchConfigured(Exception):
+    """The board's column comes from its own DIP switch and cannot be assigned."""
+
+    def __init__(self, mac: str, column: Optional[int]):
+        self.mac, self.column = mac, column
+        super().__init__(
+            f"{mac} takes its column from its DIP switch (currently column "
+            f"{column}). Move the switch on the board and reboot it; there is "
+            f"nothing to assign.")
 
 
 class DuplicateColumn(Exception):
@@ -252,6 +273,7 @@ class ControlPlane(threading.Thread):
                 info.frames = int(msg.get("frames", 0) or 0)
                 info.torn = int(msg.get("torn", 0) or 0)
                 info.link = bool(msg.get("link", True))
+                info.col_src = str(msg.get("col_src", "") or "")
                 info.last_seen = time.time()
                 info.assigned_column = self.table.get(mac)
                 self.seen[mac] = info
@@ -260,7 +282,12 @@ class ControlPlane(threading.Thread):
                 log.info("re-assigning %s to column %d", mac, info.assigned_column)
                 self.assign(mac, info.assigned_column)
         elif kind == "ack":
-            log.info("ack from %s: %s ok=%s", mac, msg.get("of"), msg.get("ok"))
+            why = msg.get("why")
+            if msg.get("ok") is False:
+                log.warning("%s refused %s%s", mac, msg.get("of"),
+                            f": {why}" if why else "")
+            else:
+                log.info("ack from %s: %s ok=%s", mac, msg.get("of"), msg.get("ok"))
 
     # ---- outbound ------------------------------------------------------
 
@@ -289,7 +316,15 @@ class ControlPlane(threading.Thread):
         force=True the old board is told to release it FIRST - clearing only
         the Pi's table would leave that board still driving the column from
         its own NVS.
+
+        Raises SwitchConfigured if the board is known to take its column from
+        a DIP switch. Only a listening control plane knows that; for one that
+        is not, the board refuses the command itself and says why.
         """
+        with self._lock:
+            known = self.seen.get(mac.lower())
+        if known is not None and known.col_src == "dip":
+            raise SwitchConfigured(mac.lower(), known.column)
         ctrl = self.wall.controller_by_column(column)
         holder = self.table.holder_of(column)
         if holder and holder != mac.lower():
@@ -351,7 +386,16 @@ class ControlPlane(threading.Thread):
                 self.seen.values(),
                 key=lambda i: (i.column if i.column is not None else 99, i.mac),
             )
-            return [i.as_dict() for i in infos]
+            rows = [i.as_dict() for i in infos]
+        # Two boards with their switches set alike both claim the column AND
+        # both take its address. Half the wall goes dark, and from the floor it
+        # looks like a content bug. This is the cheapest place to say so.
+        claims = Counter(r["column"] for r in rows
+                         if r["online"] and r["column"] is not None)
+        for r in rows:
+            if r["online"] and r["column"] is not None and claims[r["column"]] > 1:
+                r["state"] = "duplicate"
+        return rows
 
     def unassigned(self) -> List[ControllerInfo]:
         with self._lock:
@@ -361,12 +405,13 @@ class ControlPlane(threading.Thread):
         rows = self.snapshot()
         if not rows:
             return "no controllers have announced themselves"
-        w = ["col  mac                ip               fw        state     age"]
+        w = ["col  src   mac                ip               fw                    "
+             "state      age"]
         for r in rows:
             col = "-" if r["column"] is None else str(r["column"])
             w.append(
-                f"{col:<4} {r['mac']:<18} {r['ip']:<16} {r['fw'] or '-':<9} "
-                f"{r['state']:<9} {r['age_s']}s"
+                f"{col:<4} {r['col_src'] or '-':<5} {r['mac']:<18} {r['ip']:<16} "
+                f"{r['fw'] or '-':<21} {r['state']:<10} {r['age_s']}s"
             )
         return "\n".join(w)
 
