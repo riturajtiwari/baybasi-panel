@@ -8,7 +8,17 @@
 // preference - see hw/FABRICATION.md.  Nothing here is a suggestion.
 // ---------------------------------------------------------------------------
 
-#define FW_VERSION "0.1.0"
+// Semantic version plus the git revision the image was built from, which
+// git_rev.py injects at build time. Every board announces the pair, so
+// `baybasi discover` names the exact build on each column - and "-dirty" says
+// the image came from uncommitted source, which on a board in a wall is worth
+// knowing. 0.1.0 never moved from the first build; 0.2.0 is the first release
+// that reads the column switch.
+#define FW_SEMVER "0.2.0"
+#ifndef FW_GIT
+#define FW_GIT "nogit"
+#endif
+#define FW_VERSION FW_SEMVER "+" FW_GIT
 
 // ---- W5500 on SPI ---------------------------------------------------------
 static constexpr int PIN_ETH_CS   = 10;   // devkit pad 16, FSPI IOMUX
@@ -118,6 +128,10 @@ static constexpr uint32_t IDENTIFY_DEFAULT_MS = 5000;
 static constexpr uint32_t IDLE_REFRESH_MS   = 40;    // keep showing while idle
 
 // ---- addressing before a board is commissioned ----------------------------
+// REV A ONLY. A rev B board reads its column from SW1 (column-select block,
+// below), so it is never unassigned and none of this runs. It applies to boards
+// built with -DNO_COLUMN_DIP.
+//
 // There is deliberately NO DHCP server on the pixel segment. An unassigned
 // board therefore never gets an address from the network, and with no address
 // it cannot announce - which is the one thing an unassigned board exists to
@@ -178,8 +192,42 @@ constexpr uint8_t fallbackHostByte(uint8_t mac4, uint8_t mac5) {
 static constexpr uint8_t CHANNEL_MAP[3] = {2, 0, 1};   // src R,G,B -> slots
 
 // ---- identity -------------------------------------------------------------
-// All four boards run this same image.  Which column a board owns lives in NVS
-// and is set at commissioning, so an OTA can never put column 3's identity on
-// column 1.
+// All four boards run this same image, so an OTA can never put column 3's
+// identity on column 1. Which column a board owns comes from SW1 on rev B, or
+// from NVS set at commissioning on rev A.
 #define NVS_NAMESPACE "baybasi"
 static constexpr int8_t COLUMN_UNASSIGNED = -1;
+
+// ---- column select, rev B -------------------------------------------------
+// SW1, a 4-pole DIP. Poles 1 and 2 are the column in plain binary. Poles 3 and
+// 4 ("SP") are wired to GPIO 17/18 and were proven on hardware 2026-09-29, but
+// stay deliberately unread until there is something for them to say.
+//
+// Every pole's common side is GND and the internal pull-ups are enabled, so an
+// OPEN pole reads 1 and a CLOSED pole (ON, toward the GND pads) reads 0 - and
+// the firmware inverts. Closed = 1.
+//
+//     silkscreen   "2"   "1"     column   address          DDP id
+//                  off   off       0      192.168.50.11      10
+//                  off   ON        1      192.168.50.12      11
+//                  ON    off       2      192.168.50.13      12
+//                  ON    ON        3      192.168.50.14      13
+//
+// The switch is AUTHORITATIVE. No merge with NVS, nothing written to NVS, and
+// an `assign` from the Pi is refused with an ack that says why: one source of
+// truth was the whole point (hw/DIP-COLUMN-SELECT.md). A board moved to another
+// slot follows its switches, not a memory of where it used to be. Read once at
+// boot; a reboot is the honest way to apply a new setting.
+//
+// Rev A boards have no switch. Their GPIO 9/16 float high through the pull-ups
+// and would all read as column 0, so build them with -DNO_COLUMN_DIP, which
+// restores the NVS-and-commissioning path unchanged.
+#ifndef NO_COLUMN_DIP
+#define COLUMN_DIP 1
+#else
+#define COLUMN_DIP 0
+#endif
+static constexpr int     PIN_COL_B0   = 9;    // SW1 pole 1, silkscreen "1"
+static constexpr int     PIN_COL_B1   = 16;   // SW1 pole 2, silkscreen "2"
+static constexpr uint8_t COL_IP_BASE  = 11;   // column c -> 192.168.50.(11 + c)
+static constexpr uint8_t COL_DDP_BASE = 10;   // column c -> DDP id (10 + c)

@@ -134,6 +134,7 @@ bool begin() {
 // ourselves - so keying "usable" off the event is what kept an unassigned
 // board on a DHCP-less segment from ever announcing.
 bool linkUp() { return ETH.linkUp() && ETH.hasIP(); }
+bool cable() { return ETH.linkUp(); }
 IPAddress localIP() { return ETH.localIP(); }
 const char *macString() { return identity::macString(); }
 uint32_t linkDrops() { return g_drops; }

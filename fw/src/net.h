@@ -25,6 +25,9 @@ namespace net {
 
 bool begin();
 bool linkUp();
+// The physical link alone, address or no address. linkUp() needs both, which
+// is right for "can I announce" and wrong for "is the cable in".
+bool cable();
 IPAddress localIP();
 const char *macString();
 uint32_t linkDrops();

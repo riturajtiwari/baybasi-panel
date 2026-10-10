@@ -43,10 +43,17 @@ uint32_t ipToU32(const String &s) {
     return a.fromString(s) ? (uint32_t)a : 0;
 }
 
-void ack(const char *of, bool ok) {
-    char buf[128];
-    snprintf(buf, sizeof(buf), "{\"t\":\"ack\",\"mac\":\"%s\",\"of\":\"%s\","
-             "\"ok\":%s}", identity::macString(), of, ok ? "true" : "false");
+// `why` travels with a refusal, so the operator reads the reason on the Pi
+// rather than having to go and find a serial cable.
+void ack(const char *of, bool ok, const char *why = nullptr) {
+    char buf[224];
+    if (why)
+        snprintf(buf, sizeof(buf), "{\"t\":\"ack\",\"mac\":\"%s\",\"of\":\"%s\","
+                 "\"ok\":%s,\"why\":\"%s\"}", identity::macString(), of,
+                 ok ? "true" : "false", why);
+    else
+        snprintf(buf, sizeof(buf), "{\"t\":\"ack\",\"mac\":\"%s\",\"of\":\"%s\","
+                 "\"ok\":%s}", identity::macString(), of, ok ? "true" : "false");
     g_udp.broadcastTo((uint8_t *)buf, strlen(buf), CTRL_PORT);
 }
 
@@ -62,6 +69,16 @@ void onPacket(AsyncUDPPacket &pkt) {
     const String t = field(doc, "t");
 
     if (t == "assign") {
+        // A switch board has no column to give away. Refuse out loud: accepting
+        // and then ignoring it on the next boot would look like the Pi had been
+        // obeyed right up until the moment it mattered.
+        if (identity::get().fromSwitch()) {
+            ack("assign", false, "column is set by the DIP switch on this board");
+            log_w("assign from the Pi refused: column %d comes from SW1 - move "
+                  "the switch and reboot to change it",
+                  (int)identity::get().column);
+            return;
+        }
         const String col = field(doc, "col");
         if (col.isEmpty() || col == "null") {
             identity::clear();
@@ -141,13 +158,15 @@ void tick() {
     if (!net::linkUp()) return;
 
     const Identity &id = identity::get();
-    char buf[288];
+    char buf[320];
     if (id.assigned()) {
         snprintf(buf, sizeof(buf),
-                 "{\"t\":\"announce\",\"mac\":\"%s\",\"col\":%d,\"fw\":\"%s\","
+                 "{\"t\":\"announce\",\"mac\":\"%s\",\"col\":%d,"
+                 "\"col_src\":\"%s\",\"fw\":\"%s\","
                  "\"up\":%lu,\"frames\":%lu,\"torn\":%lu,\"gaps\":%lu,"
                  "\"link\":true,\"ip\":\"%s\"}",
-                 identity::macString(), (int)id.column, FW_VERSION,
+                 identity::macString(), (int)id.column, identity::sourceName(),
+                 FW_VERSION,
                  (unsigned long)(now / 1000), (unsigned long)frames.frames(),
                  (unsigned long)frames.torn(),
                  (unsigned long)ddp::stats().sequenceGaps,
@@ -155,7 +174,8 @@ void tick() {
     } else {
         // No column yet.  This is the message the operator is waiting to see.
         snprintf(buf, sizeof(buf),
-                 "{\"t\":\"announce\",\"mac\":\"%s\",\"col\":null,\"fw\":\"%s\","
+                 "{\"t\":\"announce\",\"mac\":\"%s\",\"col\":null,"
+                 "\"col_src\":\"none\",\"fw\":\"%s\","
                  "\"up\":%lu,\"link\":true,\"ip\":\"%s\"}",
                  identity::macString(), FW_VERSION,
                  (unsigned long)(now / 1000),

@@ -1,6 +1,8 @@
 # Column select by DIP switch — spec for batch 2
 
-Status: **proposed 2026-09-20**, not built. Decide before the batch-2 layout.
+Status: **implemented, firmware 0.2.0, 2026-10-09.** Proposed 2026-09-20,
+built into rev B, hardware proven on rev B board 1 on 2026-09-29. What follows
+is the design record; `fw/README.md` "Board identity" is the operator's view.
 
 ## The problem it solves
 

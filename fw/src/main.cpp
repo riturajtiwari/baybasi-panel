@@ -1,7 +1,8 @@
 // Baybasi controller firmware.
 //
-// One image for all four boards.  A board learns which column it owns from NVS,
-// set once at commissioning, so an OTA can never move column 3's identity onto
+// One image for all four boards.  A board learns which column it owns from its
+// column DIP switch (rev B, read once at boot) or from NVS set at commissioning
+// (rev A, -DNO_COLUMN_DIP), so an OTA can never move column 3's identity onto
 // column 1.  Everything else - the wall's shape, the panel chain, the row to
 // output map, gamma, brightness - lives on the Pi.  This board knows only that
 // it owns 9216 bytes and where they go on its twelve outputs.
@@ -55,9 +56,19 @@ bool g_identifyOn = false, g_wasIdentifying = false;
 
 void logSummary() {
     const ddp::Stats &s = ddp::stats();
-    log_i("col=%d ip=%s frames=%lu shown=%lu torn=%lu gaps=%lu pkts=%lu "
+    const Identity &id = identity::get();
+    // Identity and link on every summary, not only at boot. The boot lines go
+    // out ~250 ms after reset, before a laptop has even re-enumerated the USB
+    // port, so they are lost to anyone who plugs in later - which is everyone
+    // standing at a wall. "want" is the address the switch or NVS asked for,
+    // "ip" the one the interface actually holds; they differ until the cable
+    // is in.
+    log_i("col=%d src=%s want=%s ip=%s cable=%s",
+          (int)id.column, identity::sourceName(),
+          id.ip ? IPAddress(id.ip).toString().c_str() : "dhcp",
+          net::localIP().toString().c_str(), net::cable() ? "up" : "DOWN");
+    log_i("frames=%lu shown=%lu torn=%lu gaps=%lu pkts=%lu "
           "rejected=%lu malformed=%lu oversize=%lu heap=%lu",
-          (int)identity::get().column, net::localIP().toString().c_str(),
           (unsigned long)frames.frames(), (unsigned long)g_shown,
           (unsigned long)frames.torn(), (unsigned long)s.sequenceGaps,
           (unsigned long)s.packets, (unsigned long)s.rejected,
