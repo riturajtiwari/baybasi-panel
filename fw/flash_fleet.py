@@ -4,15 +4,23 @@
     ~/.platformio/penv/bin/python3 flash_fleet.py          # from fw/
 
 Builds once, then waits. Plug a devkit in: if it is factory-fresh it says so
-and waits for the BOOT dance; otherwise it flashes the image built at the start
-(never a rebuild, so every board in the run carries the same bytes), reads the
-board's identity line back over serial, prints one row, and waits for the next.
+and waits for the BOOT dance; otherwise it flashes the image, reads the board's
+identity line back over serial, prints one row, and waits for the next.
 Ctrl-C ends the run.
+
+Every board gets the same bytes. Each upload is a plain `pio run -t upload`,
+whose build is incremental - unchanged source compiles nothing and leaves
+firmware.bin as it was - and the image's SHA-256 is checked after every board,
+so an edit made mid-run is caught rather than silently shipped to half the
+fleet. NOT `-t nobuild`: on this platform that skips assembling the bootloader
+and partition images, and esptool's write-flash then refuses its own command
+line ("Must be pairs of an address and the binary filename").
 
 macOS only: it watches the USB bus through ioreg. Needs pyserial, which
 PlatformIO's own Python already has.
 """
 import glob
+import hashlib
 import os
 import plistlib
 import re
@@ -25,6 +33,7 @@ import serial
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PIO = shutil.which("pio") or os.path.expanduser("~/.platformio/penv/bin/pio")
+BIN = os.path.join(HERE, ".pio", "build", "baybasi-ctrl", "firmware.bin")
 DEMO_PID = 0x4001     # factory RGB demo on TinyUSB: esptool cannot reset it
 JTAG_PID = 0x1001     # USB-Serial/JTAG: the ROM, or this firmware running
 
@@ -51,6 +60,11 @@ def espressif():
     for d in walk(root):
         return d.get("idProduct"), d.get("USB Serial Number") or ""
     return None
+
+
+def image_hash():
+    with open(BIN, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:16]
 
 
 def port():
@@ -96,7 +110,8 @@ def main():
         print(b.stdout[-2000:], b.stderr[-2000:])
         sys.exit("build failed")
     rev = rev.group(1) if rev else "?"
-    print(f"image built from {rev}" +
+    want = image_hash()
+    print(f"image built from {rev}, sha256 {want}" +
           ("   WARNING: uncommitted source - every board will say -dirty"
            if rev.endswith("-dirty") else ""), flush=True)
     print("\nplug in a devkit. Ctrl-C when the run is done.\n", flush=True)
@@ -114,9 +129,14 @@ def main():
                 mac = dev[1].lower()
                 time.sleep(1.0)
                 print(f"{mac}: flashing ...", flush=True)
-                r = subprocess.run([PIO, "run", "-t", "nobuild", "-t", "upload",
+                r = subprocess.run([PIO, "run", "-t", "upload",
                                     "--upload-port", port()],
                                    cwd=HERE, capture_output=True, text=True)
+                if image_hash() != want:
+                    print(f"{mac}: STOP - the image changed during the run "
+                          f"(source edited?). This board did not get the same "
+                          f"bytes as the others.", flush=True)
+                    sys.exit(3)
                 if r.returncode != 0:
                     print(f"{mac}: UPLOAD FAILED - unplug, replug and it will "
                           f"retry\n" + "\n".join(r.stdout.splitlines()[-6:]))
