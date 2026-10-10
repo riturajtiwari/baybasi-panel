@@ -8,8 +8,8 @@
 // preference - see hw/FABRICATION.md.  Nothing here is a suggestion.
 // ---------------------------------------------------------------------------
 
-// Semantic version plus the git revision the image was built from, which
-// git_rev.py injects at build time. Every board announces the pair, so
+// Semantic version plus the last commit that touched the firmware's own source,
+// which git_rev.py injects at build time (docs and tool commits leave it alone). Every board announces the pair, so
 // `baybasi discover` names the exact build on each column - and "-dirty" says
 // the image came from uncommitted source, which on a board in a wall is worth
 // knowing. 0.1.0 never moved from the first build; 0.2.0 is the first release
